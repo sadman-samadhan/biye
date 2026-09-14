@@ -1,0 +1,221 @@
+@import "tailwindcss";
+
+/* Prevent scroll during loading */
+body.loading {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* RTL Support for Urdu/Arabic */
+@layer utilities {
+  .direction-rtl {
+    direction: rtl;
+    text-align: right;
+  }
+}
+
+/* Film grain texture for cinematic feel */
+.film-grain {
+  position: relative;
+  overflow: hidden;
+}
+
+.film-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3.5' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  animation: grain 8s steps(10) infinite;
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -25%); }
+  40% { transform: translate(-5%, 25%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+/* Vignette overlay for hero sections */
+.vignette {
+  position: relative;
+}
+
+.vignette::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.15) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Drop cap for story sections */
+.drop-cap::first-letter {
+  float: left;
+  font-size: 4.5em;
+  line-height: 0.75;
+  margin: 0.1em 0.15em 0 0;
+  font-family: var(--font-display);
+  color: var(--color-clay);
+  font-weight: 600;
+}
+
+/* Hanging punctuation for quotes */
+.hanging-quote {
+  text-indent: -0.45em;
+}
+
+/* Decorative quotation marks */
+.fancy-quote {
+  position: relative;
+  padding-left: 2em;
+}
+
+.fancy-quote::before {
+  content: '"';
+  position: absolute;
+  left: -0.2em;
+  top: -0.1em;
+  font-size: 5em;
+  line-height: 1;
+  opacity: 0.08;
+  font-family: var(--font-display);
+  color: var(--color-clay);
+  font-weight: 700;
+}
+
+/* Optical alignment for centered text */
+.optical-center {
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Small caps for labels */
+.small-caps {
+  font-variant: small-caps;
+  letter-spacing: 0.1em;
+}
+
+/* Smooth Scrolling with offset for fixed nav */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF9F6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #A67C52;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8B6A47;
+}
+
+/* Prevent horizontal scroll */
+body {
+  overflow-x: hidden;
+}
+
+/* Hide default cursor only on pages with .has-custom-cursor (wedding sites) */
+@media (min-width: 1024px) {
+  body.has-custom-cursor,
+  body.has-custom-cursor * {
+    cursor: none;
+  }
+
+  body.has-custom-cursor input,
+  body.has-custom-cursor textarea,
+  body.has-custom-cursor select {
+    cursor: auto;
+  }
+}
+
+/* Better font rendering */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Performance optimizations */
+@layer utilities {
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+}
+
+/* Tailwind v4 Theme Configuration */
+@theme {
+  --color-bone: #FAF9F6;
+  --color-graphite: #2B2B2B;
+  --color-warm-grey: #E8E2DB;
+  --color-clay: #A67C52;
+  --color-deep-wine: #6B2C3E;
+  --color-saffron: #D4A574;
+  --color-terracotta: #C85A3C;
+  --color-pure-white: #FFFFFF;
+  --color-onyx: #1A1A1A;
+  --color-whisper: #FCFCFB;
+  --color-success: #2D6A4F;
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-arabic: var(--font-arabic), 'Amiri', 'Traditional Arabic', 'Scheherazade New', 'Noto Naskh Arabic', Arial, sans-serif;
+  --font-bangla: var(--font-bangla), 'Galada', 'Kalpurush', 'SolaimanLipi', sans-serif;
+  --font-sanskrit: var(--font-sanskrit), 'Tiro Devanagari Sanskrit', 'Noto Serif Devanagari', 'Mangal', 'Kokila', serif;
+
+  /* Typography Scale */
+  --font-size-hero: clamp(3.5rem, 10vw, 7rem);
+  --font-size-display: clamp(2.5rem, 6vw, 4.5rem);
+  --font-size-arabic: clamp(1.8rem, 4vw, 3.2rem);
+  --font-size-body-lg: 1.25rem;
+  --font-size-small: 0.875rem;
+  --font-size-tiny: 0.75rem;
+}
+
+/* Explicit Script Font Classes with Universal Fallbacks */
+.font-arabic {
+  font-family: var(--font-arabic), 'Amiri', 'Traditional Arabic', 'Scheherazade New', 'Noto Naskh Arabic', 'Geeza Pro', Arial, sans-serif;
+  direction: rtl;
+}
+
+.font-sanskrit {
+  font-family: var(--font-sanskrit), 'Tiro Devanagari Sanskrit', 'Noto Serif Devanagari', 'Mangal', 'Kokila', 'Utsaah', 'Sanskrit Text', serif;
+}
+
+/* Backdrop blur support for glassmorphism */
+@supports (backdrop-filter: blur(10px)) {
+  .backdrop-blur-md {
+    backdrop-filter: blur(12px);
+  }
+  
+  .backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+  }
+}

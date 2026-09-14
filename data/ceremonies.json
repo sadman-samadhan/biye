@@ -1,0 +1,295 @@
+{
+  "ceremonies": [
+    {
+      "id": "akth",
+      "title": {
+        "en": "The Akth",
+        "bn": "পবিত্র আখত"
+      },
+      "subtitle": {
+        "en": "The Sacred Nikah",
+        "bn": "পবিত্র নিকাহ"
+      },
+      "date": {
+        "en": "17 December 2024",
+        "bn": "১৭ ডিসেম্বর ২০২৪"
+      },
+      "venue": {
+        "en": "Central Mosque, Khulna",
+        "bn": "খুলনা বিশ্ববিদ্যালয় কেন্দ্রীয় মসজিদ"
+      },
+      "description": {
+        "en": "In the serenity of the House of Allah, we formalized our union. The Akth ceremony was the signing of our eternal contract (Nikah), a moment of pure devotion where we pledged our lives to one another under the guidance of our faith.",
+        "bn": "আল্লাহর ঘরের পরম প্রশান্তিতে দুটি জীবনের শুভ সূচনা হলো। নিকাহর পবিত্র চুক্তি স্বাক্ষরের মাধ্যমে ঈমান ও ভালোবাসার আলোয় আমাদের চিরন্তন অঙ্গীকার সম্পন্ন হয়।"
+      },
+      "culturalNote": {
+        "en": "The Nikah is the heart of an Islamic wedding—a sacred contract signed in the presence of witnesses to legalize the marriage in the eyes of God.",
+        "bn": "নিকাহ হলো বৈবাহিক সম্পর্কের মূল ভিত্তি—সাক্ষীদের উপস্থিতিতে সম্পাদিত এক পবিত্র ধর্মীয় অঙ্গীকার।"
+      },
+      "heroImage": "Akth/SFK07551.jpg",
+      "heroImagePosition": "center",
+      "galleryImages": [
+        "Akth/KSH06234.jpg",
+        "Akth/KSH06237.jpg",
+        "Akth/SFK07471.jpg",
+        "Akth/KSH06263.jpg",
+        "Akth/KSH06333.jpg",
+        "Akth/KSH06371.jpg",
+        "Akth/KSH06456.jpg",
+        "Akth/KSH06505.jpg",
+        "Akth/KSH06477.jpg",
+        "Akth/KSH06396.jpg",
+        "Akth/SFK07544.jpg",
+        "Akth/SFK07521.jpg"
+      ],
+      "accentColor": "clay",
+      "dua": {
+        "ar": "بَارَكَ اللهُ لَكَ وَبَارَكَ عَلَيْكَ وَجَمَعَ بَيْنَكُمَا فِي خَيْرٍ",
+        "en": "May Allah bless you, shower His blessings upon you, and join you together in goodness"
+      },
+      "flow": [
+        {
+          "beat": "Arrival",
+          "title": {
+            "en": "Gathering at the Mosque",
+            "bn": "মসজিদ প্রাঙ্গণে সমবেত"
+          },
+          "description": {
+            "en": "Family and friends gathered in the courtyard. A hushed anticipation filled the air as we prepared to enter the prayer hall.",
+            "bn": "স্বজন ও শুভাকাঙ্ক্ষীদের আগমন। শান্ত ও পবিত্র পরিবেশে সবাই নিকাহর মাহেন্দ্রক্ষণের অপেক্ষায়।"
+          },
+          "images": ["Akth/SFK07472.jpg", "Akth/KSH06263.jpg"]
+        },
+        {
+          "beat": "Recitation",
+          "title": {
+            "en": "Words of Divine Wisdom",
+            "bn": "কোরআন তিলাওয়াত ও খুতবা"
+          },
+          "description": {
+            "en": "The Imam recited verses from the Quran, reminding us of the sanctity of marriage and the rights of one another.",
+            "bn": "ইমাম সাহেবের কণ্ঠে পবিত্র কোরআনের বাণী ও দাম্পত্য জীবনের দায়িত্ব ও অধিকারের আলোকপাত।"
+          },
+          "images": ["Akth/KSH06587.jpg", "Akth/KSH06679.jpg"]
+        },
+        {
+          "beat": "The Contract",
+          "title": {
+            "en": "The Signing (Nikah)",
+            "bn": "নিকাহনামায় স্বাক্ষর"
+          },
+          "description": {
+            "en": "With bismillah, the pen touched the paper. The contract was signed, sealing our promise in ink and intention.",
+            "bn": "বিসমিল্লাহ বলে কলম স্পর্শ করল নিকাহনামা। সই আর কবুলের মাধ্যমে রচিত হলো আজীবনের মেলবন্ধন।"
+          },
+          "images": ["Akth/SFK07535.jpg", "Akth/SFK07544.jpg"]
+        },
+        {
+          "beat": "Dua",
+          "title": {
+            "en": "Blessings from Elders",
+            "bn": "মুরুব্বিদের প্রাণঢালা দোয়া"
+          },
+          "description": {
+            "en": "Hands raised in prayer. Tears of gratitude. The elders blessed us, their duas weaving a protective canopy over our future.",
+            "bn": "হাত তুলে মোনাজাত ও কৃতজ্ঞতার অশ্রু। গুরুজনদের অন্তরনিংড়ানো দোয়া আমাদের আগামী দিনগুলোকে বরকতময় করে দিল।"
+          },
+          "images": ["Akth/KSH06643.jpg"]
+        }
+      ]
+    },
+    {
+      "id": "wedding",
+      "title": {
+        "en": "The Wedding",
+        "bn": "শুভ বিবাহ"
+      },
+      "subtitle": {
+        "en": "The Grand Celebration",
+        "bn": "আনন্দমুখর মহোৎসব"
+      },
+      "date": {
+        "en": "18 December 2024",
+        "bn": "১৮ ডিসেম্বর ২০২৪"
+      },
+      "venue": {
+        "en": "The Grand Hall, Khulna",
+        "bn": "গ্র্যান্ড কনভেনশন হল, খুলনা"
+      },
+      "description": {
+        "en": "Following the sacred Nikah, we gathered to celebrate our union with joy and festivity. The Wedding Reception was a vibrant tapestry of laughter, food, and shared happiness with all our loved ones.",
+        "bn": "নিকাহর পর আনন্দ ও উৎসবের আমেজে অনুষ্ঠিত হলো মূল বিবাহ সংবর্ধনা। প্রিয়জনদের মিলনমেলা, সুস্বাদু খাবার আর প্রাণখোলা হাসিতে মুখরিত এক স্মরণীয় দিন।"
+      },
+      "culturalNote": {
+        "en": "The Wedding Reception is the time for the community to come together, feast, and publicly celebrate the newly married couple.",
+        "bn": "শুভ বিবাহ সংবর্ধনায় সকল আত্মীয়-স্বজন ও শুভানুধ্যায়ীরা একত্রিত হয়ে নবদম্পতিকে বরণ করে নেন।"
+      },
+      "heroImage": "Wedding/KSH07793.jpg",
+      "heroImagePosition": "center",
+      "galleryImages": [
+        "Wedding/KSH07771.jpg",
+        "Wedding/KSH07902.jpg",
+        "Wedding/KSH07764.jpg",
+        "Wedding/KSH07921.jpg",
+        "Wedding/KSH07842.jpg",
+        "Wedding/KSH08401.jpg",
+        "Wedding/KSH08385.jpg",
+        "Wedding/KSH07801.jpg",
+        "Wedding/KSH08409.jpg",
+        "Wedding/KSH08371.jpg",
+        "Wedding/KSH07852.jpg",
+        "Wedding/SFK07714.jpg"
+      ],
+      "accentColor": "deep-wine",
+      "dua": {
+        "ar": "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ",
+        "en": "Our Lord, grant us from among our spouses and offspring comfort to our eyes"
+      },
+      "flow": [
+        {
+          "beat": "Entrance",
+          "title": {
+            "en": "A Royal Entrance",
+            "bn": "রাজকীয় আগমন"
+          },
+          "description": {
+            "en": "Walking into the hall, hand in hand. The lights, the smiles, the overwhelming love that greeted us.",
+            "bn": "হাতে হাত রেখে অনুষ্ঠানস্থলে প্রবেশ। ঝলমলে আলো আর প্রিয়জনদের ভালোবাসায় সিক্ত অভ্যর্থনা।"
+          },
+          "images": ["Wedding/KSH07972.jpg", "Wedding/KSH08004 (1).jpg"]
+        },
+        {
+          "beat": "Celebration",
+          "title": {
+            "en": "Moments on Stage",
+            "bn": "মঞ্চের সুন্দর মুহূর্ত"
+          },
+          "description": {
+            "en": "Seated together, watching two families become one. A flurry of photos, gifts, and heartfelt congratulations.",
+            "bn": "স্টেজে নবদম্পতি। দুই পরিবারের মিলনমেলা, ছবি তোলা আর উপচে পড়া শুভকামনা।"
+          },
+          "images": ["Wedding/KSH08367.jpg", "Wedding/KSH08395.jpg"]
+        },
+        {
+          "beat": "Escape",
+          "title": {
+            "en": "Outdoor Photoshoot",
+            "bn": "স্মৃতিময় ফটোসেশন"
+          },
+          "description": {
+            "en": "We captured the quiet essence of our love in candid moments surrounded by nature and memories.",
+            "bn": "কোলাহল ছেড়ে কিছুটা সময় একান্ত মুহূর্তের ছবি বন্দি করা, যা আজীবন অমলিন থাকবে।"
+          },
+          "images": ["Wedding/KSH07908.jpg", "Wedding/KSH07902.jpg", "Wedding/KSH07858.jpg", "Wedding/KSH07868.jpg"]
+        },
+        {
+          "beat": "Together",
+          "title": {
+            "en": "Beginning of Forever",
+            "bn": "চিরন্তন সূচনার বিদায় বেলা"
+          },
+          "description": {
+            "en": "The hands that raised her let go, so the hands that will cherish her can hold on. An emotional farewell blessing.",
+            "bn": "যে মমতায় বাবা-মা বড় করেছিলেন, সেই ভালোবাসার আস্থা রেখে নতুন সংসারে পা রাখা — অশ্রুসিক্ত বিদায় ও আশীর্বাদ।"
+          },
+          "images": ["Wedding/biday1.png", "Wedding/Screenshot 2026-02-02 132750.png", "Wedding/biday2.png", "Wedding/Screenshot 2026-02-02 131700.png"]
+        }
+      ]
+    },
+    {
+      "id": "holud",
+      "title": {
+        "en": "The Holud",
+        "bn": "গায়ে হলুদ"
+      },
+      "subtitle": {
+        "en": "Colors of Joy",
+        "bn": "হলুদের রঙে রাঙানো"
+      },
+      "date": {
+        "en": "16 December 2024",
+        "bn": "১৬ ডিসেম্বর ২০২৪"
+      },
+      "venue": {
+        "en": "Family Home, Khulna",
+        "bn": "পারিবারিক নিবাস, খুলনা"
+      },
+      "description": {
+        "en": "A vibrant pre-wedding celebration where turmeric paste blessed our union. Surrounded by laughter, music, and the warmth of family, this ancient tradition brought color and joy to our journey.",
+        "bn": "বিয়ের আগে বর্ণিল হলুদের সন্ধ্যা। আত্মীয়-পরিজনদের গান, নাচ আর কাঁচা হলুদের ছোঁয়ায় ভরে ওঠে পুরো উৎসব।"
+      },
+      "culturalNote": {
+        "en": "Holud (Gaye Holud) is a festive tradition where family and friends apply turmeric paste to the couple for purification and glowing skin.",
+        "bn": "গায়ে হলুদ বাঙালির এক প্রিয় উৎসব, যেখানে শুভকামনা ও সৌন্দর্যের প্রতীক হিসেবে হলুদ ছোঁয়ানো হয়।"
+      },
+      "heroImage": "Holud/KSH07294.jpg",
+      "heroImagePosition": "center",
+      "galleryImages": [
+        "Holud/KSH07197.jpg",
+        "Holud/KSH07143.jpg",
+        "Holud/KSH06971.jpg",
+        "Holud/KSH07012.jpg",
+        "Holud/KSH07152.jpg",
+        "Holud/KSH07157.jpg",
+        "Holud/KSH07119.jpg",
+        "Holud/KSH07211.jpg",
+        "Holud/KSH07031.jpg",
+        "Holud/KSH07620.jpg",
+        "Holud/KSH07617.jpg",
+        "Holud/KSH07733 (1).jpg",
+        "Holud/KSH07136.jpg"
+      ],
+      "accentColor": "saffron",
+      "flow": [
+        {
+          "beat": "Setup",
+          "title": {
+            "en": "Golden Decor",
+            "bn": "গাঁদা ফুলের সাজ"
+          },
+          "description": {
+            "en": "Marigolds hung like prayers. Yellow filled every corner, as if the sun itself descended to bless.",
+            "bn": "হলুদ ও কমলা গাঁদা ফুলে সেজেছে মঞ্চ, চারিদিকে আলোর রোশনাই আর উৎসবের সুর।"
+          },
+          "images": ["Holud/Holud_stage.jpg", "Holud/KSH07294.jpg"]
+        },
+        {
+          "beat": "Ritual",
+          "title": {
+            "en": "The Turmeric Touch",
+            "bn": "হলুদ বরণ ও মিষ্টিমুখ"
+          },
+          "description": {
+            "en": "Elders dipped hands into turmeric. The paste, warm and fragrant, marked the skin with ancient blessings.",
+            "bn": "মুরুব্বিরা কাঁচা হলুদ মেখে মিষ্টিমুখ করিয়ে পরম মমতায় আশীর্বাদ করলেন।"
+          },
+          "images": ["Holud/IMG-20241215-WA0525.jpg", "Holud/IMG-20241215-WA0592.jpg"]
+        },
+        {
+          "beat": "Festivity",
+          "title": {
+            "en": "Groom's Arrival",
+            "bn": "বরের আগমন ও ডালি তত্ত্ব"
+          },
+          "description": {
+            "en": "Groom arrived with gifts, sweets, and friends, joining the lively celebration.",
+            "bn": "তত্ত্ব ও ডালা নিয়ে বরের দলের আনন্দময় আগমন ও উৎসবমুখর উপস্থিতি।"
+          },
+          "images": ["Holud/KSH07615.jpg", "Holud/KSH07617.jpg"]
+        },
+        {
+          "beat": "Close",
+          "title": {
+            "en": "Radiant & Ready",
+            "bn": "আলোর ঝলকানি ও সমাপ্তি"
+          },
+          "description": {
+            "en": "The night ended with glowing hearts, surrounded by the love that carries us to the wedding day.",
+            "bn": "রংমশাল আর আতশবাজির আলোয় শেষ হলো হলুদের রাত, মনের মাঝে মূল বিবাহের অপেক্ষা।"
+          },
+          "images": ["Holud/fireworkjpg.jpg"]
+        }
+      ]
+    }
+  ]
+}
