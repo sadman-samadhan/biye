@@ -13,6 +13,13 @@ const BASE = process.env.SMOKE_BASE_URL || 'http://localhost:3000'
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+// Well-formed rows, so a refusal proves a permission check rather than a schema error
+const VALID_ROW = {
+  sites: () => ({ slug: `smoke-${Date.now()}` }),
+  site_content: () => ({ site_id: crypto.randomUUID() }),
+  messages: () => ({ name: 'smoke', message: 'smoke' }),
+}
+
 const results = []
 const record = (name, refused, detail) => results.push({ name, refused, detail })
 
@@ -21,6 +28,11 @@ async function probe(name, url, init = {}, { allowEmptyArray = false } = {}) {
     const res = await fetch(url, { redirect: 'manual', ...init })
     let refused = res.status >= 300
     let detail = `HTTP ${res.status}`
+    if (res.status >= 400) {
+      const text = await res.clone().text().catch(() => '')
+      const reason = text.match(/"(?:message|error)"\s*:\s*"([^"]{0,70})/)?.[1]
+      if (reason) detail += ` ${reason}`
+    }
     if (!refused && allowEmptyArray) {
       const body = await res.json().catch(() => null)
       refused = Array.isArray(body) && body.length === 0
@@ -45,12 +57,12 @@ async function supabaseProbes() {
     await probe(`anon INSERT ${table}`, `${rest}/${table}`, {
       method: 'POST',
       headers: h,
-      body: JSON.stringify(table === 'sites' ? { slug: `smoke-${Date.now()}` } : { name: 'x', message: 'x' }),
+      body: JSON.stringify(VALID_ROW[table]()),
     })
     await probe(`anon UPDATE ${table}`, `${rest}/${table}?id=not.is.null`, {
       method: 'PATCH',
       headers: { ...h, Prefer: 'return=representation' },
-      body: JSON.stringify({ updated_at: new Date().toISOString() }),
+      body: JSON.stringify(table === 'messages' ? { approved: true } : { updated_at: new Date().toISOString() }),
     }, { allowEmptyArray: true })
     await probe(`anon DELETE ${table}`, `${rest}/${table}?id=not.is.null`, {
       method: 'DELETE',
@@ -64,10 +76,10 @@ async function supabaseProbes() {
     body: JSON.stringify({ prefix: '', limit: 10 }),
   }, { allowEmptyArray: true })
 
-  await probe('anon storage UPLOAD site-media', `${SUPABASE_URL}/storage/v1/object/site-media/smoke/${Date.now()}.txt`, {
+  await probe('anon storage UPLOAD site-media', `${SUPABASE_URL}/storage/v1/object/site-media/smoke/${Date.now()}.png`, {
     method: 'POST',
-    headers: { apikey: ANON, Authorization: `Bearer ${ANON}`, 'Content-Type': 'text/plain' },
-    body: 'smoke',
+    headers: { apikey: ANON, Authorization: `Bearer ${ANON}`, 'Content-Type': 'image/png' },
+    body: new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
   })
 }
 

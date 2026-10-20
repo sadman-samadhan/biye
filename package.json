@@ -2,14 +2,13 @@
   "name": "amarbiye",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test \"tests/unit/**/*.test.mjs\"",
-    "smoke:security": "node --env-file=.env.local scripts/security_smoke.mjs",
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"tests/unit/**/*.test.mjs\"",
+    "smoke:security": "node --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local scripts/security_smoke.mjs",
     "db:start": "supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,supavisor,postgres-meta",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset"
