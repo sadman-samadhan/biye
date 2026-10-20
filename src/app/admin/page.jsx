@@ -1,187 +1,104 @@
-'use client'
-
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { PlusCircle, Users, CheckCircle, Clock, ExternalLink, Sparkles, ArrowRight } from 'lucide-react'
+import { ArrowRight, PlusCircle } from 'lucide-react'
+import { Badge, Button, Card, CardHeader, EmptyState, STATUS_BADGE } from '@/ui'
+import { requireAdminPage } from '@/lib/server/auth'
+import { isSupabaseConfigured, serviceClient } from '@/lib/server/supabase'
+import { effectiveStatus } from '@/lib/server/site-data'
 
-export default function AdminDashboard() {
-  const [sites, setSites] = useState([])
-  const [loading, setLoading] = useState(true)
+export const metadata = { title: 'Overview | ShubhoBiye admin' }
 
-  useEffect(() => {
-    async function loadSites() {
-      try {
-        const res = await fetch('/api/admin/sites')
-        const data = await res.json()
-        setSites(data.sites || [])
-      } catch (err) {
-        console.error('Failed to load sites:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    loadSites()
-  }, [])
+const MILESTONE = 50
 
-  const totalSites = sites.length
-  const liveSites = sites.filter(s => s.status === 'live').length
-  const draftSites = sites.filter(s => s.status === 'draft').length
-  const targetClients = 50
-  const progressPercent = Math.min(Math.round((liveSites / targetClients) * 100), 100)
+async function loadSites() {
+  if (!isSupabaseConfigured()) return { sites: [], renewalsSoon: 0 }
+  const { data } = await serviceClient()
+    .from('sites')
+    .select('id, slug, status, owner_name, plan_expiry_date, created_at')
+    .order('created_at', { ascending: false })
+  const sites = data || []
+  const now = Date.now()
+  const renewalsSoon = sites.filter((s) => {
+    const expiry = s.plan_expiry_date ? new Date(s.plan_expiry_date).getTime() : 0
+    return expiry > now && expiry - now < 30 * 86400000
+  }).length
+  return { sites, renewalsSoon }
+}
+
+function Stat({ label, value, hint }) {
+  return (
+    <Card className="p-5">
+      <p className="text-xs font-semibold uppercase tracking-wider text-sb-muted">{label}</p>
+      <p className="mt-2 font-display text-4xl font-semibold tabular-nums text-sb-ink">{value}</p>
+      {hint && <p className="mt-1 text-xs text-sb-muted">{hint}</p>}
+    </Card>
+  )
+}
+
+export default async function AdminOverview() {
+  await requireAdminPage('/admin')
+  const { sites, renewalsSoon: soon } = await loadSites()
+  const statuses = sites.map(effectiveStatus)
+  const live = statuses.filter((s) => s === 'live').length
+  const drafts = statuses.filter((s) => s === 'draft').length
+  const progress = Math.min(100, Math.round((live / MILESTONE) * 100))
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl md:text-4xl text-white font-semibold tracking-tight">
-            ShubhoBiye Dashboard
-          </h1>
-          <p className="text-zinc-400 text-sm mt-1">
-            Operator Console • Manage client wedding sites & intake pipeline
-          </p>
+          <h1 className="font-display text-3xl font-semibold text-sb-ink sm:text-4xl">Overview</h1>
+          <p className="mt-1 text-sm text-sb-muted">Client sites, drafts in progress and renewals coming up.</p>
         </div>
-
-        <Link
-          href="/admin/sites/new"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#A67C52] to-[#8C643E] hover:from-[#B88B5E] hover:to-[#9C7046] text-white text-sm font-medium rounded-xl shadow-lg shadow-[#A67C52]/20 transition-all duration-300 shrink-0"
-        >
-          <PlusCircle size={18} />
-          New Client Intake
-        </Link>
+        <Button href="/admin/sites/new" variant="primary" icon={PlusCircle}>
+          New client
+        </Button>
       </div>
 
-      {/* Target Progress Bar (0 to 50 Clients) */}
-      <div className="p-6 bg-gradient-to-r from-zinc-900 to-zinc-950 border border-white/10 rounded-2xl">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Sparkles size={16} className="text-[#D4A574]" />
-            <span className="text-sm font-medium text-white">V1 Growth Milestone: First 50 Clients</span>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat label="Live sites" value={live} />
+        <Stat label="Drafts" value={drafts} />
+        <Stat label="Renewals in 30 days" value={soon} />
+        <Card className="p-5">
+          <p className="text-xs font-semibold uppercase tracking-wider text-sb-muted">First {MILESTONE} couples</p>
+          <p className="mt-2 font-display text-4xl font-semibold tabular-nums text-sb-ink">{progress}%</p>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-sb-soft" role="progressbar" aria-valuenow={live} aria-valuemin={0} aria-valuemax={MILESTONE}>
+            <div className="h-full rounded-full bg-sb-marigold" style={{ width: `${progress}%` }} />
           </div>
-          <span className="text-xs font-semibold text-[#D4A574] px-2.5 py-1 bg-[#A67C52]/20 rounded-full">
-            {liveSites} / {targetClients} Clients ({progressPercent}%)
-          </span>
-        </div>
-        <div className="w-full h-3 bg-zinc-800 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-[#A67C52] via-[#D4A574] to-emerald-500 transition-all duration-500 rounded-full"
-            style={{ width: `${Math.max(progressPercent, 4)}%` }}
-          />
-        </div>
-        <p className="text-xs text-zinc-500 mt-2">
-          Keep monthly cost at $0 until reaching 50 paying couples.
-        </p>
+        </Card>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="p-6 bg-zinc-900/60 border border-white/5 rounded-2xl">
-          <div className="flex items-center justify-between text-zinc-400 mb-2">
-            <span className="text-xs uppercase tracking-wider font-medium">Total Sites</span>
-            <Users size={18} className="text-zinc-500" />
+      <Card>
+        <CardHeader
+          title="Recent sites"
+          actions={
+            <Link href="/admin/sites" className="inline-flex items-center gap-1 text-sm text-sb-marigold-deep hover:underline">
+              All sites <ArrowRight size={14} />
+            </Link>
+          }
+        />
+        {sites.length === 0 ? (
+          <div className="p-6">
+            <EmptyState title="No client sites yet" action={<Button href="/admin/sites/new" variant="primary">Create the first one</Button>} />
           </div>
-          <div className="font-display text-3xl font-semibold text-white">
-            {loading ? '...' : totalSites}
-          </div>
-        </div>
-
-        <div className="p-6 bg-zinc-900/60 border border-white/5 rounded-2xl">
-          <div className="flex items-center justify-between text-zinc-400 mb-2">
-            <span className="text-xs uppercase tracking-wider font-medium">Live Sites</span>
-            <CheckCircle size={18} className="text-emerald-400" />
-          </div>
-          <div className="font-display text-3xl font-semibold text-emerald-400">
-            {loading ? '...' : liveSites}
-          </div>
-        </div>
-
-        <div className="p-6 bg-zinc-900/60 border border-white/5 rounded-2xl">
-          <div className="flex items-center justify-between text-zinc-400 mb-2">
-            <span className="text-xs uppercase tracking-wider font-medium">Drafts</span>
-            <Clock size={18} className="text-amber-400" />
-          </div>
-          <div className="font-display text-3xl font-semibold text-amber-400">
-            {loading ? '...' : draftSites}
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Sites */}
-      <div className="bg-zinc-900/40 border border-white/10 rounded-2xl overflow-hidden">
-        <div className="p-6 border-b border-white/5 flex items-center justify-between">
-          <h2 className="font-display text-xl text-white font-medium">
-            Recent Wedding Sites
-          </h2>
-          <Link
-            href="/admin/sites"
-            className="text-xs text-[#D4A574] hover:underline flex items-center gap-1"
-          >
-            View All Sites <ArrowRight size={14} />
-          </Link>
-        </div>
-
-        <div className="divide-y divide-white/5">
-          {loading ? (
-            <div className="p-8 text-center text-zinc-500 text-sm">Loading sites...</div>
-          ) : sites.length === 0 ? (
-            <div className="p-12 text-center text-zinc-500 space-y-3">
-              <p>No wedding sites created yet.</p>
-              <Link
-                href="/admin/sites/new"
-                className="inline-block text-xs text-[#D4A574] underline"
-              >
-                Start your first client intake →
-              </Link>
-            </div>
-          ) : (
-            sites.slice(0, 5).map((site) => (
-              <div
-                key={site.id}
-                className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-3">
-                    <span className="font-display text-lg text-white font-medium">
+        ) : (
+          <ul className="divide-y divide-sb-line">
+            {sites.slice(0, 8).map((site, i) => {
+              const status = STATUS_BADGE[statuses[i]] || STATUS_BADGE.draft
+              return (
+                <li key={site.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-6">
+                  <div className="min-w-0">
+                    <Link href={`/admin/sites/${site.id}`} className="font-medium text-sb-ink hover:underline">
                       {site.owner_name || site.slug}
-                    </span>
-                    <span
-                      className={`text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full ${
-                        site.status === 'live'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : site.status === 'expired'
-                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                          : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                      }`}
-                    >
-                      {site.status}
-                    </span>
+                    </Link>
+                    <p className="text-xs text-sb-muted">/{site.slug}</p>
                   </div>
-                  <div className="text-xs text-zinc-500 font-mono">
-                    /s/{site.slug}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <Link
-                    href={`/s/${site.slug}`}
-                    target="_blank"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded-lg transition-colors"
-                  >
-                    <span>View Site</span>
-                    <ExternalLink size={13} />
-                  </Link>
-                  <Link
-                    href={`/admin/sites/${site.id}`}
-                    className="px-3 py-1.5 bg-[#A67C52]/20 hover:bg-[#A67C52]/30 text-[#D4A574] border border-[#A67C52]/40 text-xs rounded-lg transition-colors font-medium"
-                  >
-                    Edit / Moderate
-                  </Link>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+                  <Badge tone={status.tone}>{status.label}</Badge>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </Card>
     </div>
   )
 }

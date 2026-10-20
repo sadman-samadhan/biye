@@ -184,6 +184,21 @@ body {
   --color-whisper: #FCFCFB;
   --color-success: #2D6A4F;
 
+  /* ShubhoBiye product UI (admin console, couple dashboard, sign-in) */
+  --color-sb-paper: #FBF6EE;
+  --color-sb-card: #FFFFFF;
+  --color-sb-soft: #F4ECDF;
+  --color-sb-line: #E8DFD2;
+  --color-sb-line-strong: #D9CDBB;
+  --color-sb-ink: #1E1A17;
+  --color-sb-ink-soft: #3A332D;
+  --color-sb-muted: #6B625A;
+  --color-sb-holud: #E3A21A;
+  --color-sb-marigold: #D4741C;
+  --color-sb-marigold-deep: #B05A10;
+  --color-sb-alta: #A8323A;
+  --color-sb-sage: #2F6B47;
+
   --font-display: var(--font-display);
   --font-body: var(--font-body);
   --font-arabic: var(--font-arabic), 'Amiri', 'Traditional Arabic', 'Scheherazade New', 'Noto Naskh Arabic', Arial, sans-serif;
@@ -197,6 +212,14 @@ body {
   --font-size-body-lg: 1.25rem;
   --font-size-small: 0.875rem;
   --font-size-tiny: 0.75rem;
+}
+
+/* Readable Bengali for UI text and inputs */
+.font-bangla-body,
+input:lang(bn),
+textarea:lang(bn) {
+  font-family: var(--font-bangla-body), 'Hind Siliguri', 'Noto Sans Bengali', 'Nirmala UI', sans-serif;
+  letter-spacing: 0;
 }
 
 /* Explicit Script Font Classes with Universal Fallbacks */

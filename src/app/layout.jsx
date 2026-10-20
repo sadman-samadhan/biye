@@ -1,4 +1,4 @@
-import { Cormorant_Garamond, Inter, Amiri, Galada, Tiro_Devanagari_Sanskrit } from 'next/font/google'
+import { Cormorant_Garamond, Inter, Amiri, Galada, Tiro_Devanagari_Sanskrit, Hind_Siliguri } from 'next/font/google'
 import './globals.css'
 
 const cormorant = Cormorant_Garamond({
@@ -29,6 +29,14 @@ const galada = Galada({
   display: 'swap',
 })
 
+// Readable Bengali for body text and form inputs (Galada is a display face)
+const hindSiliguri = Hind_Siliguri({
+  weight: ['400', '500', '600'],
+  subsets: ['bengali', 'latin'],
+  variable: '--font-bangla-body',
+  display: 'swap',
+})
+
 const tiroSanskrit = Tiro_Devanagari_Sanskrit({
   weight: ['400'],
   subsets: ['devanagari', 'latin'],
@@ -49,7 +57,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${cormorant.variable} ${inter.variable} ${amiri.variable} ${galada.variable} ${tiroSanskrit.variable}`}>
+    <html lang="en" className={`${cormorant.variable} ${inter.variable} ${amiri.variable} ${galada.variable} ${tiroSanskrit.variable} ${hindSiliguri.variable}`}>
       <body className="antialiased bg-bone text-graphite">
         {children}
       </body>

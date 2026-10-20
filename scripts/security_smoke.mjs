@@ -106,9 +106,9 @@ async function appProbes() {
   ]
   for (const [label, headers] of forged) {
     await probe(`GET /api/admin/sites (${label})`, `${BASE}/api/admin/sites`, { headers })
-    await probe(`PUT /api/admin/sites/x (${label})`, `${BASE}/api/admin/sites/x`, { method: 'PUT', headers: { ...headers, ...json }, body: '{}' })
+    await probe(`POST /api/admin/sites (${label})`, `${BASE}/api/admin/sites`, { method: 'POST', headers: { ...headers, ...json }, body: '{"slug":"smoke-created"}' })
     await probe(`DELETE /api/admin/sites/x (${label})`, `${BASE}/api/admin/sites/x?permanent=true`, { method: 'DELETE', headers })
-    await probe(`PUT /api/admin/messages/x (${label})`, `${BASE}/api/admin/messages/x`, { method: 'PUT', headers: { ...headers, ...json }, body: '{"approved":true}' })
+    await probe(`PATCH /api/sites/x/messages/y (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/messages/00000000-0000-0000-0000-000000000000`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"approved":true}' })
     await probe(`POST /api/upload (${label})`, `${BASE}/api/upload`, { method: 'POST', headers, body: new FormData() })
     await probe(`POST /api/monogram (${label})`, `${BASE}/api/monogram`, { method: 'POST', headers: { ...headers, ...json }, body: '{}' })
     await probe(`GET /api/sites/x (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000`, { headers })

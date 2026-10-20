@@ -12,7 +12,8 @@
     "db:start": "supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,supavisor,postgres-meta",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
-    "admin:make": "node --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local scripts/make_admin.mjs"
+    "admin:make": "node --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local scripts/make_admin.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.0.9",
