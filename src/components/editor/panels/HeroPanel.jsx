@@ -5,11 +5,17 @@ import PanelFrame from '../PanelFrame'
 import MediaField from '../MediaField'
 import { usePanelDraft } from '../usePanelDraft'
 
-const SCRIPT_KEY = { hindu: 'sa' }
+// Original-language line of the opening verse, where the tradition has one
+const SCRIPT = {
+  muslim: { key: 'ar', label: 'Arabic', dir: 'rtl' },
+  hindu: { key: 'sa', label: 'Sanskrit' },
+  buddhist: { key: 'pi', label: 'Pali' },
+}
 
 export default function HeroPanel({ data, saveContent, upload, onDirtyChange }) {
   const hero = data.content.hero || {}
-  const scriptKey = SCRIPT_KEY[data.site.wedding_type] || 'ar'
+  const script = SCRIPT[data.site.wedding_type] || null
+  const scriptKey = script?.key || 'ar'
   const blessing = hero.blessing || data.content.blessing || {}
 
   const { draft, update, dirty, reset, commit } = usePanelDraft(
@@ -27,7 +33,7 @@ export default function HeroPanel({ data, saveContent, upload, onDirtyChange }) 
 
   async function save() {
     const nextBlessing = {
-      [scriptKey]: draft.blessingScript,
+      ...(script ? { [scriptKey]: draft.blessingScript } : {}),
       en: draft.blessing.en,
       bn: draft.blessing.bn,
       reference: draft.blessingRef,
@@ -80,15 +86,17 @@ export default function HeroPanel({ data, saveContent, upload, onDirtyChange }) 
 
       <div className="space-y-4 rounded-xl bg-sb-paper p-4">
         <p className="text-sm font-medium text-sb-ink">Opening verse</p>
-        <TextArea
-          label={scriptKey === 'sa' ? 'Sanskrit' : 'Arabic'}
-          dir={scriptKey === 'ar' ? 'rtl' : undefined}
-          lang={scriptKey === 'ar' ? 'ar' : 'sa'}
-          rows={2}
-          value={draft.blessingScript}
-          onChange={(e) => update({ blessingScript: e.target.value })}
-          hint="Leave empty to skip the original-language line."
-        />
+        {script && (
+          <TextArea
+            label={script.label}
+            dir={script.dir}
+            lang={script.key}
+            rows={2}
+            value={draft.blessingScript}
+            onChange={(e) => update({ blessingScript: e.target.value })}
+            hint="Leave empty to skip the original-language line."
+          />
+        )}
         <BilingualField label="Meaning" multiline rows={3} value={draft.blessing} onChange={(blessing) => update({ blessing })} />
         <TextInput label="Reference" value={draft.blessingRef} placeholder="Surah Ar-Rum 30:21" onChange={(e) => update({ blessingRef: e.target.value })} />
       </div>

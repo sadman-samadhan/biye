@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, ListOrdered, Plus, Trash2 } from 'lucide-react'
 import { Badge, BilingualField, Button, EmptyState, Switch, TextInput } from '@/ui'
-import { CUSTOM_EVENT_PRESETS, getTradition, isWeddingAnchorCeremony, sortCeremoniesChronologically } from '@/lib/traditions'
+import { getTradition, isAnchorCeremony, presetsFor, sortCeremonies } from '@/traditions'
 import CeremonyCarouselPicker from '@/components/admin/CeremonyCarouselPicker'
 import PanelFrame from '../PanelFrame'
 import MediaField from '../MediaField'
@@ -140,14 +140,11 @@ function CeremonyEditor({ ceremony, onChange, upload }) {
 }
 
 export default function CeremoniesPanel({ data, saveContent, upload, onDirtyChange }) {
-  const weddingType = data.site.wedding_type || 'muslim'
-  const tradition = getTradition(weddingType)
+  const tradition = getTradition(data.site.wedding_type || 'muslim', data.site.tradition_variant)
   const { draft, setDraft, dirty, reset, commit } = usePanelDraft(data.ceremonies || [], onDirtyChange)
   const [open, setOpen] = useState(() => new Set())
 
-  const presets = [...(tradition.ceremonies || []), ...CUSTOM_EVENT_PRESETS].filter(
-    (preset, index, list) => list.findIndex((p) => p.id === preset.id) === index
-  )
+  const presets = [...(tradition.ceremonies || []), ...presetsFor(tradition)]
   const available = presets.filter((p) => !draft.some((c) => c.id === p.id))
 
   const toggleOpen = (id) =>
@@ -161,7 +158,7 @@ export default function CeremoniesPanel({ data, saveContent, upload, onDirtyChan
   const replace = (index, ceremony) => setDraft(draft.map((c, i) => (i === index ? ceremony : c)))
 
   function addPreset(preset) {
-    const next = sortCeremoniesChronologically([...draft, { ...clone(preset), enabled: true }], weddingType)
+    const next = sortCeremonies([...draft, { ...clone(preset), enabled: true }])
     setDraft(next)
     toggleOpen(preset.id)
   }
@@ -189,7 +186,7 @@ export default function CeremoniesPanel({ data, saveContent, upload, onDirtyChan
       onDiscard={reset}
       actions={
         <>
-          <Button size="sm" variant="ghost" icon={ListOrdered} onClick={() => setDraft(sortCeremoniesChronologically(draft, weddingType))}>
+          <Button size="sm" variant="ghost" icon={ListOrdered} onClick={() => setDraft(sortCeremonies(draft))}>
             Sort by tradition
           </Button>
           <Button size="sm" icon={Plus} onClick={addCustom}>
@@ -221,7 +218,7 @@ export default function CeremoniesPanel({ data, saveContent, upload, onDirtyChan
 
       <ol className="space-y-3">
         {draft.map((ceremony, i) => {
-          const anchor = isWeddingAnchorCeremony(ceremony)
+          const anchor = isAnchorCeremony(ceremony)
           const isOpen = open.has(ceremony.id)
           return (
             <li key={ceremony.id} className={`rounded-xl border p-4 ${ceremony.enabled === false ? 'border-sb-line bg-sb-paper/60' : 'border-sb-line-strong'}`}>

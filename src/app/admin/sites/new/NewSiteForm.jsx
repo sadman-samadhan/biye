@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRight } from 'lucide-react'
 import { BilingualField, Button, Card, CardBody, CardHeader, Select, Switch, TextInput, ToastProvider, useToast } from '@/ui'
-import { getTradition, sortCeremoniesChronologically } from '@/lib/traditions'
+import { getTradition, sortCeremonies } from '@/traditions'
 import { slugify, slugProblem } from '@/lib/slugs'
 import { TRADITION_OPTIONS } from '@/components/editor/traditionOptions'
 
@@ -49,7 +49,7 @@ function Form() {
             blessing: tradition.defaultBlessing,
             sectionToggles: { monogram: false },
           },
-          ceremonies: sortCeremoniesChronologically(tradition.ceremonies || [], weddingType),
+          ceremonies: sortCeremonies(tradition.ceremonies || []),
           duas: { duas: tradition.defaultDuas || [], parentBlessings: tradition.parentBlessings || {} },
         }),
       })

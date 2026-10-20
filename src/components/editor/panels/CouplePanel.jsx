@@ -4,6 +4,7 @@ import { BilingualField, Select } from '@/ui'
 import PanelFrame from '../PanelFrame'
 import { usePanelDraft } from '../usePanelDraft'
 import { TRADITION_OPTIONS } from '../traditionOptions'
+import { TRADITIONS } from '@/traditions'
 
 export default function CouplePanel({ data, saveContent, saveSettings, onDirtyChange }) {
   const hero = data.content.hero || {}
@@ -11,7 +12,8 @@ export default function CouplePanel({ data, saveContent, saveSettings, onDirtyCh
     {
       coupleNames: hero.coupleNames || { en: '', bn: '' },
       date: hero.date || { en: '', bn: '' },
-      weddingType: data.site.wedding_type || 'muslim',
+      weddingType: data.site.wedding_type === 'general' ? 'universal' : data.site.wedding_type || 'muslim',
+      variant: data.site.tradition_variant || '',
     },
     onDirtyChange
   )
@@ -19,7 +21,10 @@ export default function CouplePanel({ data, saveContent, saveSettings, onDirtyCh
   async function save() {
     const latestHero = data.content.hero || {}
     await saveContent('hero', { ...latestHero, coupleNames: draft.coupleNames, date: draft.date })
-    if (draft.weddingType !== data.site.wedding_type) await saveSettings({ wedding_type: draft.weddingType })
+    const variant = TRADITIONS[draft.weddingType]?.variants ? draft.variant || TRADITIONS[draft.weddingType].defaultVariant : null
+    if (draft.weddingType !== data.site.wedding_type || variant !== (data.site.tradition_variant || null)) {
+      await saveSettings({ wedding_type: draft.weddingType, tradition_variant: variant })
+    }
     commit(draft)
   }
 
@@ -54,6 +59,14 @@ export default function CouplePanel({ data, saveContent, saveSettings, onDirtyCh
         onChange={(e) => update({ weddingType: e.target.value })}
         options={TRADITION_OPTIONS}
       />
+      {TRADITIONS[draft.weddingType]?.variants && (
+        <Select
+          label="Style"
+          value={draft.variant || TRADITIONS[draft.weddingType].defaultVariant}
+          onChange={(e) => update({ variant: e.target.value })}
+          options={Object.entries(TRADITIONS[draft.weddingType].variants).map(([value, v]) => ({ value, label: `${v.label.en} — ${v.label.bn}` }))}
+        />
+      )}
     </PanelFrame>
   )
 }

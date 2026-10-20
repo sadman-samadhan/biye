@@ -40,7 +40,8 @@ async function probe(name, url, init = {}, { allowEmptyArray = false } = {}) {
     }
     record(name, refused, detail)
   } catch (err) {
-    record(name, true, `unreachable: ${err.cause?.code || err.message}`)
+    // An unreachable server proves nothing, so it fails the run
+    record(name, false, `unreachable: ${err.cause?.code || err.message} (is the app running at ${BASE}? set SMOKE_BASE_URL)`)
   }
 }
 

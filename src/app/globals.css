@@ -170,6 +170,30 @@ body {
   }
 }
 
+/* Wedding-site theme roles. ThemeRoot sets the --t-* variables per site, so these
+   utilities (bg-t-bg, text-t-ink, font-t-display, …) follow the active theme. */
+@theme inline {
+  --color-t-bg: var(--t-bg);
+  --color-t-bg-alt: var(--t-bg-alt);
+  --color-t-surface: var(--t-surface);
+  --color-t-ink: var(--t-ink);
+  --color-t-ink-muted: var(--t-ink-muted);
+  --color-t-accent: var(--t-accent);
+  --color-t-accent-strong: var(--t-accent-strong);
+  --color-t-accent-warm: var(--t-accent-warm);
+  --color-t-on-accent: var(--t-on-accent);
+  --color-t-ornament: var(--t-ornament);
+  --color-t-line: var(--t-line);
+  --color-t-inverse: var(--t-inverse);
+  --color-t-on-inverse: var(--t-on-inverse);
+  --font-t-display: var(--t-font-display);
+  --font-t-body: var(--t-font-body);
+  --font-t-bn: var(--t-font-bn);
+  --font-t-bn-display: var(--t-font-bn-display);
+  --font-t-ar: var(--t-font-ar);
+  --font-t-sa: var(--t-font-sa);
+}
+
 /* Tailwind v4 Theme Configuration */
 @theme {
   --color-bone: #FAF9F6;
@@ -212,6 +236,29 @@ body {
   --font-size-body-lg: 1.25rem;
   --font-size-small: 0.875rem;
   --font-size-tiny: 0.75rem;
+}
+
+/* Wedding sites: honour reduced motion everywhere */
+@media (prefers-reduced-motion: reduce) {
+  [data-theme] *,
+  [data-theme] *::before,
+  [data-theme] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+[data-theme] :lang(bn) {
+  line-height: 1.75;
+}
+/* Display headings: per-theme case and tracking (Latin only; Bangla keeps its own rules) */
+[data-theme] .t-display {
+  font-family: var(--t-font-display);
+  letter-spacing: var(--t-display-tracking);
+}
+[data-theme][data-display-case='upper'] .t-display:not(:lang(bn)) {
+  text-transform: uppercase;
 }
 
 /* Wedding-site photo protection (see src/components/MediaGuard.jsx) */

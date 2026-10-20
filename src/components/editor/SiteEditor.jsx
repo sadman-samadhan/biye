@@ -23,7 +23,7 @@ import MembersPanel from './panels/MembersPanel'
 
 const PANELS = [
   { key: 'couple', group: 'Basics', label: 'Couple & date', Component: CouplePanel },
-  { key: 'look', group: 'Basics', label: 'Look & sections', Component: LookPanel },
+  { key: 'look', group: 'Basics', label: 'Theme & colours', Component: LookPanel },
   { key: 'hero', group: 'Content', label: 'Opening', Component: HeroPanel },
   { key: 'story', group: 'Content', label: 'Our story', Component: StoryPanel },
   { key: 'spotlight', group: 'Content', label: 'Spotlight', Component: SpotlightPanel },

@@ -17,14 +17,15 @@ const urls = args.filter((a) => !a.startsWith('--'))
 const mobile = flags.includes('--mobile')
 const full = flags.includes('--full')
 const login = flags.find((f) => f.startsWith('--login='))?.slice(8)
+const reduced = flags.includes('--reduced')
+const suffix = flags.find((f) => f.startsWith('--suffix='))?.slice(9) || ''
 
 fs.mkdirSync(outDir, { recursive: true })
 const browser = await chromium.launch()
-const context = await browser.newContext(
-  mobile
-    ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true }
-    : { viewport: { width: 1280, height: 860 } }
-)
+const context = await browser.newContext({
+  ...(mobile ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true } : { viewport: { width: 1280, height: 860 } }),
+  ...(reduced ? { reducedMotion: 'reduce' } : {}),
+})
 const page = await context.newPage()
 
 if (login) {
@@ -40,8 +41,19 @@ if (login) {
 for (const url of urls) {
   await page.goto(url, { waitUntil: 'networkidle', timeout: 120_000 }).catch((e) => console.error(url, e.message))
   await page.waitForTimeout(1200)
+  if (full) {
+    // Scroll through so scroll-triggered reveals and lazy images run, then back to top
+    await page.evaluate(async () => {
+      for (let y = 0; y < document.body.scrollHeight; y += Math.round(window.innerHeight * 0.5)) {
+        window.scrollTo(0, y)
+        await new Promise((r) => setTimeout(r, 300))
+      }
+      window.scrollTo(0, 0)
+    })
+    await page.waitForTimeout(3500)
+  }
   const name = url.replace(/^https?:\/\/[^/]+/, '').replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'home'
-  const file = path.join(outDir, `${name}${mobile ? '.mobile' : ''}.png`)
+  const file = path.join(outDir, `${name}${suffix}${mobile ? '.mobile' : ''}.png`)
   await page.screenshot({ path: file, fullPage: full })
   console.log(file)
 }

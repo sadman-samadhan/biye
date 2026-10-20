@@ -2,13 +2,13 @@
 
 import { RotateCcw } from 'lucide-react'
 import { BilingualField, Button, EmptyState } from '@/ui'
-import { getTradition } from '@/lib/traditions'
+import { getTradition } from '@/traditions'
 import PanelFrame from '../PanelFrame'
 import { usePanelDraft } from '../usePanelDraft'
 
 /** Duas / blessings (from the tradition, editable order) plus the parents' message. */
 export default function BlessingsPanel({ data, saveContent, onDirtyChange }) {
-  const tradition = getTradition(data.site.wedding_type)
+  const tradition = getTradition(data.site.wedding_type, data.site.tradition_variant)
   const saved = data.duas || {}
   const { draft, update, dirty, reset, commit } = usePanelDraft(
     {

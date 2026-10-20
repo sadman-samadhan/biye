@@ -39,28 +39,28 @@ export default function PasscodeGate({ slug, coupleNames, date }) {
   }
 
   const field =
-    'w-full rounded-lg border border-warm-grey bg-white/80 px-4 py-3 text-base text-graphite outline-none transition focus:border-clay focus:ring-2 focus:ring-clay/25'
+    'w-full rounded-[var(--t-radius)] border border-t-line bg-t-surface px-4 py-3 text-base text-t-ink outline-none transition focus:border-t-accent focus:ring-2 focus:ring-t-accent/25'
 
   return (
     <main className="flex min-h-[100svh] items-center justify-center px-5 py-16">
       <div className="w-full max-w-sm text-center">
-        <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full border border-clay/40 text-clay">
+        <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full border border-t-ornament/60 text-t-ornament">
           <Lock size={22} />
         </div>
-        {coupleNames?.en && <h1 className="font-display text-4xl leading-tight text-graphite">{coupleNames.en}</h1>}
+        {coupleNames?.en && <h1 className="t-display text-4xl leading-tight text-t-ink">{coupleNames.en}</h1>}
         {coupleNames?.bn && (
-          <p lang="bn" className="mt-1 font-bangla text-2xl text-graphite/70">
+          <p lang="bn" className="mt-1 font-t-bn-display text-2xl text-t-ink-muted">
             {coupleNames.bn}
           </p>
         )}
-        {date?.en && <p className="mt-3 font-body text-sm uppercase tracking-[0.25em] text-graphite/60">{date.en}</p>}
+        {date?.en && <p className="mt-3 text-sm uppercase tracking-[0.25em] text-t-ink-muted">{date.en}</p>}
 
-        <div className="mx-auto my-8 h-px w-16 bg-clay/50" />
+        <div className="mx-auto my-8 h-px w-16 bg-t-ornament/60" />
 
-        <p className="font-body text-[15px] leading-relaxed text-graphite/80">
+        <p className="text-[15px] leading-relaxed text-t-ink">
           This celebration is for invited guests. Enter the passcode from your invitation.
         </p>
-        <p lang="bn" className="mt-1 font-bangla-body text-[15px] leading-relaxed text-graphite/70">
+        <p lang="bn" className="mt-1 font-t-bn text-[15px] leading-relaxed text-t-ink-muted">
           আমন্ত্রণপত্রে দেওয়া পাসকোডটি লিখুন।
         </p>
 
@@ -100,21 +100,21 @@ export default function PasscodeGate({ slug, coupleNames, date }) {
           <button
             type="submit"
             disabled={pending || !passcode.trim()}
-            className="w-full rounded-lg bg-graphite px-4 py-3 font-body text-sm font-semibold uppercase tracking-[0.2em] text-bone transition hover:bg-clay disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-[var(--t-radius)] bg-t-ink px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-t-bg transition hover:bg-t-accent hover:text-t-on-accent disabled:cursor-not-allowed disabled:opacity-50"
           >
             {pending ? (
               'Opening…'
             ) : (
               <>
                 Enter ·{' '}
-                <span lang="bn" className="font-bangla-body normal-case tracking-normal">
+                <span lang="bn" className="font-t-bn normal-case tracking-normal">
                   প্রবেশ করুন
                 </span>
               </>
             )}
           </button>
         </form>
-        <p className="mt-6 text-xs text-graphite/50">Can’t find it? Ask the family who invited you.</p>
+        <p className="mt-6 text-xs text-t-ink-muted">Can’t find it? Ask the family who invited you.</p>
       </div>
     </main>
   )

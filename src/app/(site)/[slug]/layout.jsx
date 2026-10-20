@@ -1,8 +1,5 @@
 import { getSiteContent } from '@/lib/server/site-data'
 import { getSiteForRequest } from '@/lib/server/site-view'
-import DynamicPalette from '@/components/DynamicPalette'
-import CustomCursor from '@/components/CustomCursor'
-import PageLoader from '@/components/PageLoader'
 import MediaGuard from '@/components/MediaGuard'
 import { notFound } from 'next/navigation'
 
@@ -50,18 +47,11 @@ export async function generateMetadata({ params }) {
 export default async function WeddingSiteLayout({ children, params }) {
   const { slug } = await params
 
-  const found = await getSiteForRequest(slug)
-  if (!found) {
-    notFound()
-  }
-  const { site } = found
+  if (!(await getSiteForRequest(slug))) notFound()
 
   return (
-    <div data-protected className="min-h-screen bg-bone text-graphite antialiased transition-colors duration-500 selection:bg-clay selection:text-white">
+    <div data-protected>
       <MediaGuard />
-      <PageLoader />
-      <CustomCursor />
-      <DynamicPalette palette={site.palette} />
       {children}
     </div>
   )

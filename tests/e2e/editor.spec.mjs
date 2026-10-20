@@ -46,13 +46,14 @@ test('operator creates a site, edits every core section and publishes it', async
   await gallery.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByText('Gallery saved')).toBeVisible()
 
-  // 6. Look: second palette, hide the guestbook
-  await page.getByRole('navigation', { name: 'Editor sections' }).getByRole('button', { name: 'Look & sections' }).click()
-  const look = page.locator('div:not([hidden]) > section').filter({ hasText: 'Look & sections' })
-  await look.getByRole('radio').nth(1).click()
+  // 6. Look: Jharokha theme with its second palette, hide the guestbook
+  await page.getByRole('navigation', { name: 'Editor sections' }).getByRole('button', { name: 'Theme & colours' }).click()
+  const look = page.locator('div:not([hidden]) > section').filter({ hasText: 'Theme & colours' })
+  await look.getByRole('radiogroup', { name: 'Theme' }).getByRole('radio', { name: /Jharokha/ }).click()
+  await look.getByRole('radiogroup', { name: 'Colour palette' }).getByRole('radio').nth(1).click()
   await look.getByRole('switch', { name: 'Guestbook' }).click()
   await look.getByRole('button', { name: 'Save changes' }).click()
-  await expect(page.getByText('Look & sections saved')).toBeVisible()
+  await expect(page.getByText('Theme & colours saved')).toBeVisible()
 
   // 7. Couple access: invite link
   await page.getByRole('navigation', { name: 'Editor sections' }).getByRole('button', { name: 'Couple access' }).click()
@@ -79,6 +80,7 @@ test('operator creates a site, edits every core section and publishes it', async
   const guest = await browser.newContext()
   const guestPage = await guest.newPage()
   expect((await guestPage.goto(`/${slug}`)).status()).toBe(200)
+  await expect(guestPage.locator('[data-theme="jharokha"]')).toHaveCount(1)
   await expect(guestPage.locator('body')).toContainText('Dhanmondi Lake Pavilion')
   await expect(guestPage.locator('img[src*="/object/sign/"]')).toHaveCount(0)
 

@@ -8,6 +8,10 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   serverExternalPackages: ['@napi-rs/canvas', 'sharp'],
+  // Bundled OFL fonts for server-side rendering (monograms, share cards)
+  outputFileTracingIncludes: {
+    '/api/sites/[siteId]/monogram': ['./assets/fonts/**'],
+  },
   images: {
     // Photos are pre-resized into thumb/web variants at upload and served through
     // short-lived signed URLs, so Next's optimizer (and its shared cache) is not used.
