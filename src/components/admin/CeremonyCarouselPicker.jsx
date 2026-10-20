@@ -12,7 +12,8 @@ export default function CeremonyCarouselPicker({
   onChange,
   onUpload,
   maxImages = 5,
-  label = 'Ceremony Moments Carousel'
+  label = 'Ceremony Moments Carousel',
+  resolveSrc = (value) => value,
 }) {
   const [uploading, setUploading] = useState(false)
   const [selectedCropIndex, setSelectedCropIndex] = useState(null)
@@ -41,9 +42,9 @@ export default function CeremonyCarouselPicker({
     try {
       const newItems = []
       for (const file of filesToUpload) {
-        const publicUrl = await onUpload(file)
-        if (publicUrl) {
-          newItems.push({ url: publicUrl, position: '50% 50%' })
+        const ref = await onUpload(file)
+        if (ref) {
+          newItems.push({ url: ref, position: '50% 50%' })
         }
       }
       onChange([...normalizedImages, ...newItems])
@@ -121,7 +122,7 @@ export default function CeremonyCarouselPicker({
                 {/* Thumbnail with custom crop position */}
                 <div className="relative aspect-[4/3] w-full bg-black/60 overflow-hidden">
                   <img
-                    src={img.url}
+                    src={resolveSrc(img.url)}
                     alt={`Carousel item ${idx + 1}`}
                     style={{ objectPosition: img.position || '50% 50%' }}
                     className="w-full h-full object-cover"
@@ -186,7 +187,7 @@ export default function CeremonyCarouselPicker({
           <FocalPointPicker
             value={normalizedImages[selectedCropIndex].position || '50% 50%'}
             onChange={(newPos) => handleUpdatePosition(selectedCropIndex, newPos)}
-            imageUrl={normalizedImages[selectedCropIndex].url}
+            imageUrl={resolveSrc(normalizedImages[selectedCropIndex].url)}
             aspectRatio="aspect-[4/3]"
             targetRatioNumber={1.33}
             label={`Carousel Photo #${selectedCropIndex + 1} Preview`}

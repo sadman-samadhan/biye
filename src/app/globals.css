@@ -214,6 +214,27 @@ body {
   --font-size-tiny: 0.75rem;
 }
 
+/* Wedding-site photo protection (see src/components/MediaGuard.jsx) */
+[data-protected] :is(img, video, picture, canvas, [data-media]) {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+[data-media-hidden] [data-protected] :is(img, video, [data-media]) {
+  filter: blur(24px);
+}
+@media print {
+  [data-protected] :is(img, video, picture, canvas, [data-media]) {
+    visibility: hidden !important;
+  }
+  [data-protected]::after {
+    content: 'Photos on this page are private and are not included when printing.';
+    display: block;
+    padding: 2rem;
+    font: 14px/1.5 sans-serif;
+  }
+}
+
 /* Readable Bengali for UI text and inputs */
 .font-bangla-body,
 input:lang(bn),

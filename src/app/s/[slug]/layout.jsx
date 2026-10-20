@@ -3,6 +3,7 @@ import { getSiteForRequest } from '@/lib/server/site-view'
 import DynamicPalette from '@/components/DynamicPalette'
 import CustomCursor from '@/components/CustomCursor'
 import PageLoader from '@/components/PageLoader'
+import MediaGuard from '@/components/MediaGuard'
 import { notFound } from 'next/navigation'
 
 // Couples' sites are private by default: never indexed, no image search, no snippets.
@@ -56,7 +57,8 @@ export default async function WeddingSiteLayout({ children, params }) {
   const { site } = found
 
   return (
-    <div className="min-h-screen bg-bone text-graphite antialiased transition-colors duration-500 selection:bg-clay selection:text-white">
+    <div data-protected className="min-h-screen bg-bone text-graphite antialiased transition-colors duration-500 selection:bg-clay selection:text-white">
+      <MediaGuard />
       <PageLoader />
       <CustomCursor />
       <DynamicPalette palette={site.palette} />

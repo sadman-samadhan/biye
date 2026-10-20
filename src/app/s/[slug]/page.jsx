@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getSiteContent } from '@/lib/server/site-data'
 import { getSiteForRequest } from '@/lib/server/site-view'
+import { resolveContentMedia } from '@/lib/server/media/resolve'
 
 import Navigation from '@/components/Navigation'
 import ScrollProgress from '@/components/ScrollProgress'
@@ -26,7 +27,7 @@ export default async function WeddingSitePage({ params }) {
   }
   const { site, status, viewer } = found
 
-  const siteContent = await getSiteContent(site.id)
+  const siteContent = await resolveContentMedia(site.id, await getSiteContent(site.id))
   const heroData = siteContent?.content?.hero
   const storyData = siteContent?.content?.story
   const brideRevealData = siteContent?.content?.brideReveal

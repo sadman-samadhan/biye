@@ -8,6 +8,7 @@ import CeremonyCarouselPicker from '@/components/admin/CeremonyCarouselPicker'
 import PanelFrame from '../PanelFrame'
 import MediaField from '../MediaField'
 import { usePanelDraft } from '../usePanelDraft'
+import { useMediaUrls } from '../media-context'
 
 const DHAKA_OFFSET = '+06:00'
 
@@ -44,6 +45,7 @@ function uniqueId(base, list) {
 }
 
 function CeremonyEditor({ ceremony, onChange, upload }) {
+  const { resolve } = useMediaUrls()
   const set = (patch) => onChange({ ...ceremony, ...patch })
   const beats = ceremony.beats || []
   const setBeat = (i, patch) => set({ beats: beats.map((b, j) => (j === i ? { ...b, ...patch } : b)) })
@@ -97,7 +99,8 @@ function CeremonyEditor({ ceremony, onChange, upload }) {
         onChange={(heroImage) => set({ heroImage })}
         onPositionChange={(heroImagePosition) => set({ heroImagePosition })}
         upload={upload}
-        category={ceremony.id}
+        slot="ceremony"
+        album={ceremony.id}
         aspect="aspect-[16/9]"
         ratio={1.77}
         aspectLabel="16:9 banner"
@@ -106,7 +109,8 @@ function CeremonyEditor({ ceremony, onChange, upload }) {
       <CeremonyCarouselPicker
         images={ceremony.carouselImages || []}
         onChange={(carouselImages) => set({ carouselImages })}
-        onUpload={(file) => upload(file, ceremony.id)}
+        onUpload={async (file) => (await upload(file, { slot: 'ceremony', album: ceremony.id })).token}
+        resolveSrc={(value) => resolve(value)}
         label="Photo carousel (up to 5)"
       />
 

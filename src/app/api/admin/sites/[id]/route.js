@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server'
 import { assertSameOrigin, getCurrentUser, requireAdmin } from '@/lib/server/auth'
 import { isSupabaseConfigured, serviceClient } from '@/lib/server/supabase'
 import { writeAudit } from '@/lib/server/site-data'
-import { deleteSiteStorage } from '@/lib/storage'
+import { keys, storage } from '@/lib/server/storage'
+import { deleteLegacySiteStorage } from '@/lib/server/legacy-storage'
 
 const notConfigured = () => NextResponse.json({ error: 'Database is not configured' }, { status: 503 })
 
@@ -37,7 +38,9 @@ export async function DELETE(req, { params }) {
   }
 
   try {
-    await deleteSiteStorage(site.id, site.slug)
+    await storage().removePrefix(keys.siteRoot(site.id))
+    await storage().removePrefix(`tmp/${site.id}/`)
+    await deleteLegacySiteStorage(site.id, site.slug)
   } catch (storageErr) {
     console.error('[DELETE site] storage purge failed:', storageErr)
     return NextResponse.json({ error: 'Could not purge stored media; nothing was deleted.' }, { status: 500 })

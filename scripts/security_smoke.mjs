@@ -76,6 +76,18 @@ async function supabaseProbes() {
     body: JSON.stringify({ prefix: '', limit: 10 }),
   }, { allowEmptyArray: true })
 
+  await probe('anon storage LIST site-media-private', `${SUPABASE_URL}/storage/v1/object/list/site-media-private`, {
+    method: 'POST',
+    headers: h,
+    body: JSON.stringify({ prefix: '', limit: 10 }),
+  }, { allowEmptyArray: true })
+  await probe('anon storage READ private object (authenticated path)', `${SUPABASE_URL}/storage/v1/object/authenticated/site-media-private/sites/x/m/y/web.webp`, { headers: h })
+  await probe('anon storage READ private object (public path)', `${SUPABASE_URL}/storage/v1/object/public/site-media-private/sites/x/m/y/web.webp`)
+  await probe('anon storage UPLOAD site-media-private', `${SUPABASE_URL}/storage/v1/object/site-media-private/sites/smoke/${Date.now()}.png`, {
+    method: 'POST',
+    headers: { apikey: ANON, Authorization: `Bearer ${ANON}`, 'Content-Type': 'image/png' },
+    body: new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+  })
   await probe('anon storage UPLOAD site-media', `${SUPABASE_URL}/storage/v1/object/site-media/smoke/${Date.now()}.png`, {
     method: 'POST',
     headers: { apikey: ANON, Authorization: `Bearer ${ANON}`, 'Content-Type': 'image/png' },
@@ -109,13 +121,15 @@ async function appProbes() {
     await probe(`POST /api/admin/sites (${label})`, `${BASE}/api/admin/sites`, { method: 'POST', headers: { ...headers, ...json }, body: '{"slug":"smoke-created"}' })
     await probe(`DELETE /api/admin/sites/x (${label})`, `${BASE}/api/admin/sites/x?permanent=true`, { method: 'DELETE', headers })
     await probe(`PATCH /api/sites/x/messages/y (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/messages/00000000-0000-0000-0000-000000000000`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"approved":true}' })
-    await probe(`POST /api/upload (${label})`, `${BASE}/api/upload`, { method: 'POST', headers, body: new FormData() })
-    await probe(`POST /api/monogram (${label})`, `${BASE}/api/monogram`, { method: 'POST', headers: { ...headers, ...json }, body: '{}' })
+    await probe(`POST /api/sites/x/uploads (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/uploads`, { method: 'POST', headers: { ...headers, ...json }, body: '{"kind":"image","contentType":"image/jpeg","bytes":1000}' })
+    await probe(`GET /api/sites/x/media (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/media`, { headers })
+    await probe(`GET /api/sites/x/media/y/download (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/media/00000000-0000-0000-0000-000000000000/download`, { headers })
+    await probe(`POST /api/sites/x/monogram (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/monogram`, { method: 'POST', headers: { ...headers, ...json }, body: '{}' })
     await probe(`GET /api/sites/x (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000`, { headers })
     await probe(`PATCH /api/sites/x/content (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/content`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"section":"hero","data":{}}' })
     await probe(`PATCH /api/sites/x/settings (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/settings`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"status":"live"}' })
     await probe(`POST /api/admin/sites/x/members (${label})`, `${BASE}/api/admin/sites/00000000-0000-0000-0000-000000000000/members`, { method: 'POST', headers: { ...headers, ...json }, body: '{"email":"a@b.co"}' })
-    await probe(`POST /api/palette (${label})`, `${BASE}/api/palette`, { method: 'POST', headers: { ...headers, ...json }, body: '{"imageUrl":"/../.env.local"}' })
+    await probe(`POST /api/sites/x/palette (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/palette`, { method: 'POST', headers: { ...headers, ...json }, body: '{"media":"media:00000000-0000-0000-0000-000000000000"}' })
   }
   await probe('GET /admin redirects to login', `${BASE}/admin`)
   await probe('GET /dashboard redirects to login', `${BASE}/dashboard`)

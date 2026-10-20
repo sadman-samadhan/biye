@@ -3,13 +3,14 @@
 import { useState } from 'react'
 import { Wand2 } from 'lucide-react'
 import { Button, useToast } from '@/ui'
-import { getImagePath } from '@/lib/media'
 import PanelFrame from '../PanelFrame'
 import MediaField from '../MediaField'
 import { usePanelDraft } from '../usePanelDraft'
+import { useMediaUrls } from '../media-context'
 
 export default function MonogramPanel({ data, saveContent, upload, onDirtyChange, canGenerate }) {
   const toast = useToast()
+  const { register } = useMediaUrls()
   const { draft, setDraft, dirty, reset, commit } = usePanelDraft(data.content.logoUrl || '', onDirtyChange)
   const [generating, setGenerating] = useState(false)
 
@@ -18,7 +19,7 @@ export default function MonogramPanel({ data, saveContent, upload, onDirtyChange
     try {
       const names = (data.content.hero?.coupleNames?.en || '').split(/\s*(?:&|and|ও)\s*/i)
       const blessing = data.content.hero?.blessing || data.content.blessing || {}
-      const res = await fetch('/api/monogram', {
+      const res = await fetch(`/api/sites/${data.site.id}/monogram`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -27,13 +28,12 @@ export default function MonogramPanel({ data, saveContent, upload, onDirtyChange
           blessingText: blessing.en,
           verseSnippet: blessing.reference,
           venue: data.ceremonies?.[0]?.venue?.en || '',
-          weddingType: data.site.wedding_type,
-          siteId: data.site.id,
         }),
       })
       const result = await res.json()
-      if (!res.ok || !result.url) throw new Error(result.error || 'Could not generate the monogram')
-      setDraft(result.url)
+      if (!res.ok || !result.media) throw new Error(result.error || 'Could not generate the monogram')
+      register(result.media)
+      setDraft(result.media.token)
     } catch (err) {
       toast.error(err.message)
     } finally {
@@ -71,15 +71,10 @@ export default function MonogramPanel({ data, saveContent, upload, onDirtyChange
           value={draft}
           onChange={setDraft}
           upload={upload}
-          category="monogram"
+          slot="monogram"
           accept="image/png,image/webp"
           aspect="aspect-square"
         />
-      )}
-      {draft && !draft.startsWith('data:') && (
-        <p className="text-xs text-sb-muted">
-          Current file: <span className="break-all">{getImagePath(draft)}</span>
-        </p>
       )}
     </PanelFrame>
   )

@@ -47,10 +47,10 @@ export default function LookPanel({ data, saveContent, saveSettings, onDirtyChan
   async function extract() {
     setExtracting(true)
     try {
-      const res = await fetch('/api/palette', {
+      const res = await fetch(`/api/sites/${site.id}/palette`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: heroImage }),
+        body: JSON.stringify({ media: heroImage }),
       })
       const result = await res.json()
       if (!res.ok) throw new Error(result.error || 'Could not read colours from the photo')

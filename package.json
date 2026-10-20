@@ -19,6 +19,7 @@
     "@napi-rs/canvas": "^1.0.9",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.93.2",
+    "aws4fetch": "^1.0.20",
     "framer-motion": "^12.29.2",
     "jose": "^6.2.13",
     "lucide-react": "^0.563.0",

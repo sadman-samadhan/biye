@@ -3,7 +3,7 @@
 import { useId, useState } from 'react'
 import { ArrowLeft, ArrowRight, ImagePlus, Trash2 } from 'lucide-react'
 import { Button, EmptyState, useToast } from '@/ui'
-import { getImagePath } from '@/lib/media'
+import { useMediaUrls } from '../media-context'
 import PanelFrame from '../PanelFrame'
 import { usePanelDraft } from '../usePanelDraft'
 
@@ -19,6 +19,7 @@ function move(list, from, to) {
 
 export default function GalleryPanel({ data, saveContent, upload, onDirtyChange }) {
   const toast = useToast()
+  const { resolve } = useMediaUrls()
   const inputId = useId()
   const { draft, setDraft, dirty, reset, commit } = usePanelDraft(data.gallery || [], onDirtyChange)
   const [progress, setProgress] = useState(null)
@@ -37,8 +38,8 @@ export default function GalleryPanel({ data, saveContent, upload, onDirtyChange 
     for (let i = 0; i < files.length; i++) {
       setProgress(`Uploading ${i + 1} of ${files.length}…`)
       try {
-        const url = await upload(files[i], album)
-        added.push({ filename: url, category: album, alt: '' })
+        const media = await upload(files[i], { slot: 'gallery', album })
+        added.push({ filename: media.token, category: album, alt: '' })
       } catch (err) {
         toast.error(err.message)
       }
@@ -91,7 +92,7 @@ export default function GalleryPanel({ data, saveContent, upload, onDirtyChange 
             <li key={`${img.filename}-${i}`} className="overflow-hidden rounded-xl border border-sb-line bg-sb-card">
               <div className="relative aspect-[4/5] bg-sb-soft">
                 {/* eslint-disable-next-line @next/next/no-img-element -- editor thumbnails of storage URLs */}
-                <img src={getImagePath(img.filename)} alt={img.alt || ''} loading="lazy" className="h-full w-full object-cover" />
+                <img src={resolve(img.filename, 'thumb')} alt={img.alt || ''} loading="lazy" className="h-full w-full object-cover" />
                 <span className="absolute left-2 top-2 rounded bg-sb-ink/75 px-1.5 py-0.5 text-[11px] font-medium text-white">{i + 1}</span>
               </div>
               <div className="space-y-2 p-2">

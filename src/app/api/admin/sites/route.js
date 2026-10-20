@@ -5,8 +5,6 @@ import { writeAudit } from '@/lib/server/site-data'
 import { slugify, slugProblem } from '@/lib/slugs'
 import { validateSection, validateSettings, CONTENT_SECTIONS } from '@/lib/content/schema'
 import { normalizePalette } from '@/lib/palettes'
-import { generateMonogram } from '@/lib/monogramGenerator'
-import { uploadSiteImage } from '@/lib/storage'
 
 const notConfigured = () => NextResponse.json({ error: 'Database is not configured' }, { status: 503 })
 
@@ -81,26 +79,6 @@ export async function POST(req) {
   if (error) {
     const duplicate = error.code === '23505'
     return NextResponse.json({ error: duplicate ? `The address "${slug}" is already taken` : error.message }, { status: duplicate ? 409 : 500 })
-  }
-
-  // Auto-generate a monogram unless one was supplied or the section is off
-  if (!content.logoUrl && content.sectionToggles?.monogram !== false) {
-    try {
-      const rawNames = content.hero?.coupleNames?.en || body.owner_name || 'Bride & Groom'
-      const names = rawNames.includes('&') ? rawNames.split('&').map((s) => s.trim()) : [rawNames, '']
-      const monogram = await generateMonogram({
-        name1: names[0] || 'Bride',
-        name2: names[1] || 'Groom',
-        blessingText: content.blessing?.en || content.hero?.blessing?.en,
-        verseSnippet: content.blessing?.reference || content.hero?.blessing?.reference,
-        venue: columns.ceremonies?.[0]?.venue?.en || '',
-        weddingType: settings.data.wedding_type,
-      })
-      const uploaded = await uploadSiteImage(monogram, { siteId: site.id, category: 'monogram', filename: 'wedding_monogram.png' })
-      if (uploaded?.publicUrl) content.logoUrl = uploaded.publicUrl
-    } catch (err) {
-      console.warn('Auto monogram generation skipped:', err.message)
-    }
   }
 
   const { error: contentError } = await supabase.from('site_content').insert({

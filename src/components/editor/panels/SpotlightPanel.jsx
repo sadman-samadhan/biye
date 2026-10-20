@@ -33,7 +33,7 @@ export default function SpotlightPanel({ data, saveContent, upload, onDirtyChang
         onChange={(imagePath) => update({ imagePath })}
         onPositionChange={(imagePosition) => update({ imagePosition })}
         upload={upload}
-        category="spotlight"
+        slot="spotlight"
         aspect="aspect-[16/9]"
         ratio={1.77}
         aspectLabel="16:9 banner"

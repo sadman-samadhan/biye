@@ -9,6 +9,9 @@ const securityHeaders = [
 const nextConfig = {
   serverExternalPackages: ['@napi-rs/canvas', 'sharp'],
   images: {
+    // Photos are pre-resized into thumb/web variants at upload and served through
+    // short-lived signed URLs, so Next's optimizer (and its shared cache) is not used.
+    unoptimized: true,
     formats: ['image/webp'],
     qualities: [75, 85, 90, 92],
     remotePatterns: [

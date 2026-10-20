@@ -63,7 +63,7 @@ export default function HeroPanel({ data, saveContent, upload, onDirtyChange }) 
         onChange={(posterPath) => update({ posterPath })}
         onPositionChange={(posterPosition) => update({ posterPosition })}
         upload={upload}
-        category="hero"
+        slot="hero"
       />
       {draft.mediaType === 'video' && (
         <MediaField
@@ -74,7 +74,7 @@ export default function HeroPanel({ data, saveContent, upload, onDirtyChange }) 
           value={draft.videoPath}
           onChange={(videoPath) => update({ videoPath })}
           upload={upload}
-          category="video"
+          slot="video"
         />
       )}
 

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { authorizeSite } from '@/lib/server/auth'
 import { serviceClient } from '@/lib/server/supabase'
 import { getSiteAccess, getSiteContent } from '@/lib/server/site-data'
+import { loadMedia, signMedia } from '@/lib/server/media/resolve'
+import { collectMediaIds } from '@/lib/media-ref'
 
 // Columns a couple can see about their own site (operator CRM fields stay hidden)
 const MEMBER_SITE_FIELDS = [
@@ -36,10 +38,15 @@ export async function GET(req, { params }) {
       .limit(500),
   ])
 
+  // Preview URLs for every photo the content references (the editor shows tokens as images)
+  const rows = await loadMedia(siteId, collectMediaIds(content))
+  const mediaUrls = await signMedia([...rows.values()])
+
   return NextResponse.json({
     role,
     site,
     ...content,
+    mediaUrls,
     access: access
       ? {
           inviteAccess: access.invite_access,

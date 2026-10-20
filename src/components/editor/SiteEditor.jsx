@@ -5,6 +5,7 @@ import { ExternalLink, Loader2 } from 'lucide-react'
 import { Badge, Button, ConfirmProvider, STATUS_BADGE, ToastProvider } from '@/ui'
 import { useSiteEditor } from './useSiteEditor'
 import { useUpload } from './useUpload'
+import { MediaUrlProvider, useMediaUrlState } from './media-context'
 import CouplePanel from './panels/CouplePanel'
 import HeroPanel from './panels/HeroPanel'
 import StoryPanel from './panels/StoryPanel'
@@ -37,7 +38,29 @@ const PANELS = [
 
 function EditorBody({ siteId, mode }) {
   const { data, error, reload, saveContent, saveSettings, setMessages } = useSiteEditor(siteId)
-  const upload = useUpload(siteId)
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-sb-alta/30 bg-[#FBEDEE] p-6 text-sm text-[#7A2229]">
+        <p className="font-medium">{error}</p>
+        <Button className="mt-3" size="sm" onClick={reload}>
+          Try again
+        </Button>
+      </div>
+    )
+  }
+  if (!data) {
+    return (
+      <div className="flex items-center gap-2 py-20 text-sb-muted">
+        <Loader2 className="animate-spin" size={18} /> Loading site…
+      </div>
+    )
+  }
+  return <LoadedEditor siteId={siteId} mode={mode} data={data} saveContent={saveContent} saveSettings={saveSettings} setMessages={setMessages} />
+}
+
+function LoadedEditor({ siteId, mode, data, saveContent, saveSettings, setMessages }) {
+  const media = useMediaUrlState(data.mediaUrls)
+  const upload = useUpload(siteId, { onUploaded: media.register })
   const isAdmin = mode === 'admin'
   const panels = useMemo(() => PANELS.filter((p) => !p.adminOnly || isAdmin), [isAdmin])
   const [active, setActive] = useState('couple')
@@ -75,29 +98,12 @@ function EditorBody({ siteId, mode }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
-  if (error) {
-    return (
-      <div className="rounded-2xl border border-sb-alta/30 bg-[#FBEDEE] p-6 text-sm text-[#7A2229]">
-        <p className="font-medium">{error}</p>
-        <Button className="mt-3" size="sm" onClick={reload}>
-          Try again
-        </Button>
-      </div>
-    )
-  }
-  if (!data) {
-    return (
-      <div className="flex items-center gap-2 py-20 text-sb-muted">
-        <Loader2 className="animate-spin" size={18} /> Loading site…
-      </div>
-    )
-  }
-
   const status = STATUS_BADGE[data.site.status] || STATUS_BADGE.draft
   const groups = [...new Set(panels.map((p) => p.group))]
-  const shared = { data, saveContent, saveSettings, setMessages, upload, canUseAi: isAdmin, canGenerate: isAdmin }
+  const shared = { data, saveContent, saveSettings, setMessages, upload, canUseAi: true, canGenerate: true }
 
   return (
+    <MediaUrlProvider value={media}>
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
@@ -151,6 +157,7 @@ function EditorBody({ siteId, mode }) {
         </div>
       </div>
     </div>
+    </MediaUrlProvider>
   )
 }
 

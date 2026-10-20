@@ -83,7 +83,7 @@ export default function StoryPanel({ data, saveContent, upload, onDirtyChange })
                 onChange={(imagePath) => setMilestone(i, { imagePath })}
                 onPositionChange={(imagePosition) => setMilestone(i, { imagePosition })}
                 upload={upload}
-                category="story"
+                slot="story"
                 aspect="aspect-[4/3]"
                 ratio={1.33}
                 aspectLabel="4:3 frame"

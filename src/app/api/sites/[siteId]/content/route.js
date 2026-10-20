@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { assertSameOrigin, authorizeSite } from '@/lib/server/auth'
 import { serviceClient } from '@/lib/server/supabase'
 import { writeAudit } from '@/lib/server/site-data'
 import { CONTENT_SECTIONS, COLUMN_SECTIONS, validateSection } from '@/lib/content/schema'
+import { collectUnreferencedMedia } from '@/lib/server/media/gc'
 
 /**
  * Save one section of a site's content.
@@ -70,5 +71,7 @@ export async function PATCH(req, { params }) {
     action: 'content.update',
     meta: { section, version: nextVersion },
   })
+  // Free storage for photos that are no longer used anywhere (after the response is sent)
+  after(() => collectUnreferencedMedia(siteId).catch((err) => console.warn('[media gc]', err.message)))
   return NextResponse.json({ success: true, version: nextVersion, data: result.data })
 }
