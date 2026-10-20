@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/server/admin-session'
 import { getSupabaseAdmin, isSupabaseConfigured } from '@/lib/supabase'
 import { DEMO_SITE } from '@/lib/getData'
 import { generateMonogram } from '@/lib/monogramGenerator'
 import { uploadSiteImage } from '@/lib/storage'
 
 export async function GET() {
+  const denied = await requireAdmin()
+  if (denied) return denied
+
   if (!isSupabaseConfigured) {
     // Return demo site in offline / mock mode
     return NextResponse.json({
@@ -28,6 +32,9 @@ export async function GET() {
 }
 
 export async function POST(req) {
+  const denied = await requireAdmin()
+  if (denied) return denied
+
   try {
     const body = await req.json()
     const {

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getSiteBySlug, getSiteContent } from '@/lib/getData'
+import { isAdminRequest } from '@/lib/server/admin-session'
 
 import Navigation from '@/components/Navigation'
 import ScrollProgress from '@/components/ScrollProgress'
@@ -15,13 +16,11 @@ import DuasSection from '@/components/DuasSection'
 import MessageBoard from '@/components/MessageBoard'
 import Footer from '@/components/Footer'
 
-export default async function WeddingSitePage({ params, searchParams }) {
-  const resolvedParams = await params
-  const resolvedSearch = await searchParams
-  const isPreview = resolvedSearch?.preview === 'true'
-  const slug = resolvedParams?.slug
+export default async function WeddingSitePage({ params }) {
+  const { slug } = await params
 
-  const site = await getSiteBySlug(slug, isPreview)
+  // Drafts and archived sites are visible to signed-in operators only
+  const site = await getSiteBySlug(slug, await isAdminRequest())
   if (!site) {
     notFound()
   }
@@ -39,9 +38,9 @@ export default async function WeddingSitePage({ params, searchParams }) {
 
   return (
     <>
-      {site.status === 'draft' && (
+      {site.status !== 'live' && (
         <aside aria-label="Draft mode banner" className="bg-amber-500/90 text-black px-4 py-2 text-center text-xs font-medium tracking-wide sticky top-0 z-[9999] backdrop-blur-md flex items-center justify-center gap-2 shadow-md">
-          <span>⚠️ <strong>Draft Mode</strong> — This wedding site is currently not published live.</span>
+          <span>⚠️ <strong>{site.status === 'archived' ? 'In Trash' : 'Draft Mode'}</strong> — Only operators can see this site. Guests get a 404.</span>
           <a href={`/admin/sites/${site.id}`} className="underline font-bold ml-2 hover:opacity-80">
             Publish Live in Admin →
           </a>
@@ -126,7 +125,7 @@ export default async function WeddingSitePage({ params, searchParams }) {
         {/* MESSAGES SECTION */}
         {siteContent?.content?.sectionToggles?.messages !== false && (
           <div id="messages">
-            <MessageBoard siteId={site.id} />
+            <MessageBoard slug={site.slug} />
           </div>
         )}
       </main>
@@ -134,8 +133,6 @@ export default async function WeddingSitePage({ params, searchParams }) {
       <Footer
         footerData={footerData}
         siteName={coupleNames}
-        ownerEmail={site.owner_email}
-        ownerPhone={site.owner_phone}
       />
     </>
   )

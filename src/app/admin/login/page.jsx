@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Lock, ArrowRight, Sparkles } from 'lucide-react'
 
@@ -24,7 +25,8 @@ export default function AdminLoginPage() {
 
       const data = await res.json()
       if (res.ok && data.success) {
-        router.push('/admin')
+        const next = new URLSearchParams(window.location.search).get('next')
+        router.push(next && next.startsWith('/admin') && !next.startsWith('//') ? next : '/admin')
       } else {
         setError(data.error || 'Invalid password')
       }
@@ -91,12 +93,12 @@ export default function AdminLoginPage() {
         </form>
 
         <div className="mt-8 pt-6 border-t border-white/5 text-center">
-          <a
+          <Link
             href="/"
             className="text-xs text-white/40 hover:text-white/70 transition-colors"
           >
             ← Return to AmarBiye Homepage
-          </a>
+          </Link>
         </div>
       </div>
     </div>

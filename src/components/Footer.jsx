@@ -1,13 +1,15 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Phone, Heart } from 'lucide-react'
 
-export default function Footer({ footerData, siteName = 'AmarBiye', ownerEmail, ownerPhone }) {
+// Contact cards render only when the couple explicitly chose to publish contact details.
+export default function Footer({ footerData, siteName = 'AmarBiye', contactEmail, contactPhone }) {
   const currentYear = new Date().getFullYear()
 
-  const email = ownerEmail || 'info@amarbiye.com'
-  const phone = ownerPhone || '01700-000000'
+  const email = contactEmail || ''
+  const phone = contactPhone || ''
   const cleanPhone = phone.replace(/[^0-9]/g, '')
   const thankYouBn = footerData?.thankYou?.bn || footerData?.thankYou?.ur || ''
 
@@ -62,7 +64,7 @@ export default function Footer({ footerData, siteName = 'AmarBiye', ownerEmail, 
             )}
           </motion.div>
 
-          <div className="flex flex-col md:flex-row gap-8 md:gap-16 mb-20">
+          <div className={`flex flex-col md:flex-row gap-8 md:gap-16 ${email || phone ? 'mb-20' : 'mb-8'}`}>
             {/* Email */}
             {email && (
               <motion.a
@@ -114,12 +116,12 @@ export default function Footer({ footerData, siteName = 'AmarBiye', ownerEmail, 
             <p>&copy; {currentYear} {siteName}. All rights reserved.</p>
             <p className="flex items-center gap-2">
               Crafted with <Heart size={13} className="text-deep-wine fill-deep-wine animate-pulse" /> on{' '}
-              <a 
-                href="/" 
+              <Link
+                href="/"
                 className="text-saffron hover:underline font-medium"
               >
                 AmarBiye
-              </a>
+              </Link>
             </p>
           </motion.div>
 

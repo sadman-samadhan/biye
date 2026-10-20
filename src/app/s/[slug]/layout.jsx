@@ -1,19 +1,25 @@
 import { getSiteBySlug, getSiteContent } from '@/lib/getData'
+import { isAdminRequest } from '@/lib/server/admin-session'
 import DynamicPalette from '@/components/DynamicPalette'
 import CustomCursor from '@/components/CustomCursor'
 import { notFound } from 'next/navigation'
 
-export async function generateMetadata({ params, searchParams }) {
-  const resolvedParams = await params
-  const resolvedSearch = await searchParams
-  const isPreview = resolvedSearch?.preview === 'true'
-  const slug = resolvedParams?.slug
+// Couples' sites are private by default: never indexed, no image search, no snippets.
+const PRIVATE_ROBOTS = {
+  index: false,
+  follow: false,
+  nocache: true,
+  googleBot: { index: false, follow: false, noimageindex: true },
+}
 
-  const site = await getSiteBySlug(slug, isPreview)
+export async function generateMetadata({ params }) {
+  const { slug } = await params
+
+  const site = await getSiteBySlug(slug, await isAdminRequest())
   if (!site) {
     return {
       title: 'Wedding Not Found | AmarBiye',
-      description: 'The requested wedding celebration could not be found.'
+      robots: PRIVATE_ROBOTS,
     }
   }
 
@@ -24,36 +30,24 @@ export async function generateMetadata({ params, searchParams }) {
   return {
     title: `${coupleNames} | Wedding Celebration`,
     description: `Join us in celebrating the wedding of ${coupleNames}. ${date}`,
+    robots: PRIVATE_ROBOTS,
     openGraph: {
       title: `${coupleNames} — Our Wedding`,
       description: `Join us in celebrating our wedding. ${date}`,
       type: 'website',
-      images: [
-        {
-          url: content?.content?.hero?.posterPath 
-            ? `/images/${content.content.hero.posterPath}` 
-            : '/wedding-logo.png',
-          width: 1200,
-          height: 630,
-          alt: coupleNames
-        }
-      ]
     },
     twitter: {
-      card: 'summary_large_image',
+      card: 'summary',
       title: `${coupleNames} — Our Wedding`,
       description: `Join us in celebrating our wedding. ${date}`
     }
   }
 }
 
-export default async function WeddingSiteLayout({ children, params, searchParams }) {
-  const resolvedParams = await params
-  const resolvedSearch = await searchParams
-  const isPreview = resolvedSearch?.preview === 'true'
-  const slug = resolvedParams?.slug
+export default async function WeddingSiteLayout({ children, params }) {
+  const { slug } = await params
 
-  const site = await getSiteBySlug(slug, isPreview)
+  const site = await getSiteBySlug(slug, await isAdminRequest())
   if (!site) {
     notFound()
   }

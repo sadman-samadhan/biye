@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/server/admin-session'
 import { getSupabaseAdmin, isSupabaseConfigured } from '@/lib/supabase'
 
 export async function PUT(req, { params }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
+
   const resolvedParams = await params
   const id = resolvedParams?.id
 
@@ -25,6 +29,9 @@ export async function PUT(req, { params }) {
 }
 
 export async function DELETE(req, { params }) {
+  const denied = await requireAdmin()
+  if (denied) return denied
+
   const resolvedParams = await params
   const id = resolvedParams?.id
 

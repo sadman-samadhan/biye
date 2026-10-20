@@ -22,7 +22,7 @@ export default function LogoReveal({ logoUrl, coupleNames, blessingData, wedding
 
   const defaultFrame = isHindu
     ? '/monogram-frames/sanatan-frame.png'
-    : '/wedding-logo.png'
+    : '/monogram-frames/islamic-frame.png'
 
   const resolvedLogo = logoUrl ? getImagePath(logoUrl) : defaultFrame
 

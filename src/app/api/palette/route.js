@@ -1,9 +1,23 @@
 import { NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/server/admin-session'
 import { PRESET_PALETTES, normalizePalette } from '@/lib/palettes'
-import fs from 'fs'
-import path from 'path'
+
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024
+
+function isOwnStorageUrl(value) {
+  try {
+    const url = new URL(value)
+    const storage = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || '')
+    return url.protocol === storage.protocol && url.host === storage.host && url.pathname.startsWith('/storage/v1/object/')
+  } catch {
+    return false
+  }
+}
 
 export async function POST(req) {
+  const denied = await requireAdmin()
+  if (denied) return denied
+
   try {
     const body = await req.json()
     const { imageUrl, imageBase64, mimeType = 'image/jpeg' } = body
@@ -39,51 +53,28 @@ export async function POST(req) {
         }
       }
 
+      if (!/^image\/(jpeg|png|webp)$/.test(detectedMime) || cleanBase64.length > (MAX_IMAGE_BYTES * 4) / 3) {
+        return NextResponse.json({ error: 'Unsupported image' }, { status: 400 })
+      }
       imagePart = {
         inlineData: {
           mimeType: detectedMime,
           data: cleanBase64
         }
       }
-    } else if (imageUrl) {
-      // If it's a local path like /images/..., read from public folder directly
-      if (imageUrl.startsWith('/')) {
-        try {
-          const localPath = path.join(process.cwd(), 'public', imageUrl.replace(/^\//, ''))
-          if (fs.existsSync(localPath)) {
-            const buffer = fs.readFileSync(localPath)
-            const ext = path.extname(localPath).toLowerCase().replace('.', '')
-            const localMime = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : 'image/jpeg'
-            imagePart = {
-              inlineData: {
-                mimeType: localMime,
-                data: buffer.toString('base64')
-              }
-            }
+    } else if (imageUrl && isOwnStorageUrl(imageUrl)) {
+      // Only fetch images that live in this project's own Supabase storage (no SSRF, no local files)
+      try {
+        const imgRes = await fetch(imageUrl, { redirect: 'error' })
+        const fetchedMime = imgRes.headers.get('content-type') || ''
+        if (imgRes.ok && /^image\/(jpeg|png|webp)$/.test(fetchedMime)) {
+          const buffer = Buffer.from(await imgRes.arrayBuffer())
+          if (buffer.length <= MAX_IMAGE_BYTES) {
+            imagePart = { inlineData: { mimeType: fetchedMime, data: buffer.toString('base64') } }
           }
-        } catch (localErr) {
-          console.warn('Failed to read local image:', localErr.message)
         }
-      }
-
-      // If not resolved locally, fetch via HTTP
-      if (!imagePart && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'))) {
-        try {
-          const imgRes = await fetch(imageUrl)
-          if (imgRes.ok) {
-            const arrayBuffer = await imgRes.arrayBuffer()
-            const fetchedMime = imgRes.headers.get('content-type') || mimeType
-            const buffer = Buffer.from(arrayBuffer)
-            imagePart = {
-              inlineData: {
-                mimeType: fetchedMime,
-                data: buffer.toString('base64')
-              }
-            }
-          }
-        } catch (fetchErr) {
-          console.warn('Failed to fetch imageUrl for Gemini:', fetchErr.message)
-        }
+      } catch (fetchErr) {
+        console.warn('Failed to fetch imageUrl for Gemini:', fetchErr.message)
       }
     }
 
@@ -166,7 +157,7 @@ You must respond ONLY with a raw JSON object (no markdown formatting, no backtic
       return NextResponse.json({
         success: true,
         isAiGenerated: false,
-        message: lastError || 'No response from Gemini Vision. Returning presets.',
+        message: 'No response from Gemini Vision. Returning presets.',
         palettes: PRESET_PALETTES
       })
     }
@@ -201,7 +192,6 @@ You must respond ONLY with a raw JSON object (no markdown formatting, no backtic
     return NextResponse.json({
       success: true,
       isAiGenerated: false,
-      error: err.message,
       palettes: PRESET_PALETTES
     })
   }

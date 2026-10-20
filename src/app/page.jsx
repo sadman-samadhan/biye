@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import Image from 'next/image'
 import {
   Sparkles,
   ArrowRight,
@@ -151,7 +150,7 @@ export default function LandingPage() {
               Live Signature Showcase
             </span>
             <h2 className="font-display text-4xl md:text-5xl text-white">
-              Arefin &amp; Sumaiya — The Sacred Union
+              A Cinematic Wedding Story
             </h2>
             <p className="font-body text-sm text-zinc-400 max-w-xl mx-auto">
               Signature wedding website: complete with cinematic teasers, multi-ceremony timeline,
@@ -162,11 +161,9 @@ export default function LandingPage() {
           {/* Showcase Device Frame */}
           <div className="relative rounded-3xl p-3 md:p-6 bg-gradient-to-b from-white/10 to-white/5 border border-white/10 shadow-2xl overflow-hidden group">
             <div className="relative rounded-2xl overflow-hidden aspect-[16/9] md:aspect-[21/9] bg-zinc-950">
-              <Image
-                src="/images/Akth/KSH06234.jpg"
-                alt="AmarBiye signature wedding showcase"
-                fill
-                className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,#A67C52_0%,#3B1A24_45%,#0E0E10_100%)] group-hover:scale-105 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-6 md:p-12">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
@@ -175,7 +172,7 @@ export default function LandingPage() {
                       Signature Template: Classic Elegance
                     </span>
                     <h3 className="font-display text-3xl md:text-4xl text-white">
-                      Arefin &amp; Sumaiya
+                      Live Demo Site
                     </h3>
                     <p className="text-xs text-zinc-300 font-body">
                       Hosted at <code className="font-mono text-[#D4A574]">amarbiye.com/s/demo</code>

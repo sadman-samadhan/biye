@@ -1,44 +1,36 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useState, useEffect, useCallback } from 'react'
 
-export default function MessageBoard({ siteId }) {
+export default function MessageBoard({ slug }) {
   const [messages, setMessages] = useState([])
   const [formData, setFormData] = useState({
     name: '',
     nameBn: '',
     message: '',
     messageBn: '',
+    website: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    fetchMessages()
-  }, [siteId])
-
-  async function fetchMessages() {
+  const fetchMessages = useCallback(async () => {
+    if (!slug) return
     try {
-      let query = supabase
-        .from('messages')
-        .select('*')
-        .eq('approved', true)
-
-      if (siteId && siteId !== 'demo-rafa-shawon') {
-        query = query.eq('site_id', siteId)
-      }
-
-      const { data } = await query
-        .order('created_at', { ascending: false })
-        .limit(50)
-      
-      setMessages(data || [])
+      const res = await fetch(`/api/g/${encodeURIComponent(slug)}/messages`)
+      if (!res.ok) return
+      const data = await res.json()
+      setMessages(data.messages || [])
     } catch {
       // Graceful offline fallback
     }
-  }
+  }, [slug])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount / slug change
+    fetchMessages()
+  }, [fetchMessages])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -46,28 +38,20 @@ export default function MessageBoard({ siteId }) {
     setError(null)
 
     try {
-      const payload = {
-        name: formData.name,
-        name_bn: formData.nameBn || null,
-        name_urdu: formData.nameBn || null, // fallback compatibility
-        message: formData.message,
-        message_bn: formData.messageBn || null,
-        message_urdu: formData.messageBn || null, // fallback compatibility
-        approved: true, // Auto-approve by default for V1
-        ...(siteId && siteId !== 'demo-rafa-shawon' ? { site_id: siteId } : {})
-      }
+      const res = await fetch(`/api/g/${encodeURIComponent(slug)}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      const data = await res.json().catch(() => ({}))
 
-      const { error } = await supabase
-        .from('messages')
-        .insert([payload])
-
-      if (!error) {
+      if (res.ok) {
         setSubmitted(true)
-        setFormData({ name: '', nameBn: '', message: '', messageBn: '' })
+        setFormData({ name: '', nameBn: '', message: '', messageBn: '', website: '' })
         fetchMessages()
         setTimeout(() => setSubmitted(false), 5000)
       } else {
-        setError('Unable to submit message. Please try again.')
+        setError(data.error || 'Unable to submit message. Please try again.')
       }
     } catch {
       setError('Unable to submit message. Please try again.')
@@ -95,6 +79,19 @@ export default function MessageBoard({ siteId }) {
         {/* Form */}
         <div className="max-w-2xl mx-auto mb-24">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Honeypot: hidden from people, tempting to bots */}
+            <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+              <label>
+                Website
+                <input
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={formData.website}
+                  onChange={(e) => setFormData({...formData, website: e.target.value})}
+                />
+              </label>
+            </div>
             
             {/* Name (English) */}
             <div>
@@ -198,8 +195,8 @@ export default function MessageBoard({ siteId }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {messages.map((msg) => {
-                const messageBn = msg.message_bn || msg.message_urdu
-                const nameBn = msg.name_bn || msg.name_urdu
+                const messageBn = msg.message_bn
+                const nameBn = msg.name_bn
                 const isMsgBangla = Boolean(msg.message_bn) || /[\u0980-\u09FF]/.test(messageBn || '')
                 const isNameBangla = Boolean(msg.name_bn) || /[\u0980-\u09FF]/.test(nameBn || '')
 

@@ -44,7 +44,6 @@ export const metadata = {
   openGraph: {
     title: 'AmarBiye — Bespoke Digital Wedding Websites',
     description: 'Transform your wedding into a timeless digital heirloom.',
-    images: ['/wedding-logo.png'],
   },
 }
 
