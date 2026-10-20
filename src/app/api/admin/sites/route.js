@@ -5,6 +5,7 @@ import { writeAudit } from '@/lib/server/site-data'
 import { slugify, slugProblem } from '@/lib/slugs'
 import { validateSection, validateSettings, CONTENT_SECTIONS } from '@/lib/content/schema'
 import { normalizePalette } from '@/lib/palettes'
+import { encryptPasscode, newPasscode } from '@/lib/server/guest-access'
 
 const notConfigured = () => NextResponse.json({ error: 'Database is not configured' }, { status: 503 })
 
@@ -88,7 +89,8 @@ export async function POST(req) {
     duas: columns.duas || { duas: [], parentBlessings: {} },
     gallery: columns.gallery || [],
   })
-  const { error: accessError } = await supabase.from('site_access').insert({ site_id: site.id })
+  // Every new site starts with a passcode so the memories stay private by default
+  const { error: accessError } = await supabase.from('site_access').insert({ site_id: site.id, passcode_enc: encryptPasscode(newPasscode()) })
 
   if (contentError || accessError) {
     await supabase.from('sites').delete().eq('id', site.id)

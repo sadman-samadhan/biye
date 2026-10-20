@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { getSiteContent } from '@/lib/server/site-data'
 import { getSiteForRequest } from '@/lib/server/site-view'
 import { resolveContentMedia } from '@/lib/server/media/resolve'
+import PasscodeGate from '@/components/PasscodeGate'
 
 import Navigation from '@/components/Navigation'
 import ScrollProgress from '@/components/ScrollProgress'
@@ -25,9 +26,14 @@ export default async function WeddingSitePage({ params }) {
   if (!found) {
     notFound()
   }
-  const { site, status, viewer } = found
+  const { site, status, viewer, guest, scope, canView, publicOnlyMedia } = found
 
-  const siteContent = await resolveContentMedia(site.id, await getSiteContent(site.id))
+  if (!canView(scope)) {
+    const { content } = await getSiteContent(site.id)
+    return <PasscodeGate slug={site.slug} coupleNames={content?.hero?.coupleNames} date={content?.hero?.date} />
+  }
+
+  const siteContent = await resolveContentMedia(site.id, await getSiteContent(site.id), { publicOnly: publicOnlyMedia })
   const heroData = siteContent?.content?.hero
   const storyData = siteContent?.content?.story
   const brideRevealData = siteContent?.content?.brideReveal
@@ -110,7 +116,7 @@ export default async function WeddingSitePage({ params }) {
         {siteContent?.content?.sectionToggles?.gallery !== false && gallery && gallery.length > 0 && (
           <>
             <div id="gallery">
-              <CinematicGallery images={gallery} />
+              <CinematicGallery images={gallery} viewerName={guest?.name || null} />
             </div>
             <SectionDivider variant="line" />
           </>

@@ -115,7 +115,7 @@ export default function LandingPage() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
           >
             <Link
-              href="/s/demo"
+              href="/demo"
               target="_blank"
               className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#A67C52] to-[#8C643E] hover:from-[#B88B5E] hover:to-[#9C7046] text-white font-body text-xs uppercase tracking-[0.2em] font-medium rounded-2xl shadow-xl shadow-[#A67C52]/25 transition-all duration-300 flex items-center justify-center gap-3"
             >
@@ -166,12 +166,12 @@ export default function LandingPage() {
                       Live Demo Site
                     </h3>
                     <p className="text-xs text-zinc-300 font-body">
-                      Hosted at <code className="font-mono text-[#D4A574]">shubhobiye.com/s/demo</code>
+                      Hosted at <code className="font-mono text-[#D4A574]">shubhobiye.com/demo</code>
                     </p>
                   </div>
 
                   <Link
-                    href="/s/demo"
+                    href="/demo"
                     target="_blank"
                     className="px-6 py-3.5 bg-white text-black hover:bg-[#FAF9F6] text-xs font-semibold uppercase tracking-wider rounded-xl transition-colors shadow-lg flex items-center gap-2 shrink-0"
                   >
@@ -346,7 +346,7 @@ export default function LandingPage() {
               </div>
               <h3 className="font-display text-2xl text-white">Private &amp; Secure</h3>
               <p className="text-sm text-zinc-400 font-light leading-relaxed">
-                Path-based privacy (`/s/your-slug`), Supabase Row Level Security, and optional expiry dates after your celebrations.
+                A private passcode for guests, photos that can’t be opened without it, and your own address at shubhobiye.com/your-names.
               </p>
             </div>
           </div>
@@ -396,7 +396,7 @@ export default function LandingPage() {
             {/* Checklist */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-8">
               {[
-                'Personalized URL: shubhobiye.com/s/your-slug',
+                'Personalized URL: shubhobiye.com/your-names',
                 'Cinematic Video Hero & Background Ambient Music',
                 'Gemini AI Color Harmony extracted from your attire',
                 'Up to 4 Custom Ceremony Timelines (Akth, Holud, etc.)',
@@ -445,7 +445,7 @@ export default function LandingPage() {
           </div>
 
           <div className="flex items-center gap-6">
-            <Link href="/s/demo" className="hover:text-white transition-colors">
+            <Link href="/demo" className="hover:text-white transition-colors">
               Live Showcase
             </Link>
             <Link href="/login" className="hover:text-white transition-colors">

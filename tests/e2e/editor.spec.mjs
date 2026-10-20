@@ -68,16 +68,37 @@ test('operator creates a site, edits every core section and publishes it', async
   await settings.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByText('Site settings saved')).toBeVisible()
 
-  // 9. A guest (no session) sees the published content
+  // 9. Privacy & sharing: the site has a passcode from creation
+  await page.getByRole('navigation', { name: 'Editor sections' }).getByRole('button', { name: 'Privacy & sharing' }).click()
+  const privacy = page.locator('div:not([hidden]) > div').filter({ hasText: 'Guest passcode' }).first()
+  const passcode = (await privacy.locator('p.font-mono').first().textContent()).trim()
+  expect(passcode).toMatch(/^[a-z]+-\d{4}$/)
+  await expect(privacy.getByAltText(/QR code/)).toBeVisible()
+
+  // 10. Before the wedding the invitation is public by default, but private photos stay hidden
   const guest = await browser.newContext()
   const guestPage = await guest.newPage()
-  const res = await guestPage.goto(`/s/${slug}`)
-  expect(res.status()).toBe(200)
+  expect((await guestPage.goto(`/${slug}`)).status()).toBe(200)
   await expect(guestPage.locator('body')).toContainText('Dhanmondi Lake Pavilion')
-  await expect(guestPage.locator('#messages')).toHaveCount(0)
+  await expect(guestPage.locator('img[src*="/object/sign/"]')).toHaveCount(0)
+
+  // 11. Make the invitation passcode-only: the guest must now enter it
+  await privacy.page().getByLabel('Invitation (before the wedding)').selectOption('passcode')
+  await expect(page.getByText('Saved').first()).toBeVisible()
+  await guestPage.reload()
+  await expect(guestPage.getByText('Enter the passcode from your invitation')).toBeVisible()
+  await expect(guestPage.locator('body')).not.toContainText('Dhanmondi Lake Pavilion')
+  await guestPage.getByPlaceholder('Passcode · পাসকোড').fill('wrong-0000')
+  await guestPage.getByRole('button', { name: /Enter/ }).click()
+  await expect(guestPage.getByText('That passcode didn’t work')).toBeVisible()
+  await guestPage.getByPlaceholder('Passcode · পাসকোড').fill(passcode.toUpperCase())
+  await guestPage.getByPlaceholder(/Your name/).fill('Rafiq Uncle')
+  await guestPage.getByRole('button', { name: /Enter/ }).click()
+  await expect(guestPage.locator('body')).toContainText('Dhanmondi Lake Pavilion')
+  await expect(guestPage.locator('img[src*="/object/sign/"]').first()).toBeVisible()
   await guest.close()
 
-  // 10. Trash and restore from the sites list
+  // 12. Trash and restore from the sites list
   await page.goto('/admin/sites')
   const row = page.getByRole('listitem').filter({ hasText: `/${slug}` })
   await row.getByRole('button', { name: `Move ${slug} to Trash` }).click()

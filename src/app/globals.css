@@ -235,6 +235,12 @@ body {
   }
 }
 
+/* Bengali never takes Latin-style letter-spacing or uppercase transforms (they break conjuncts) */
+:lang(bn) {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 /* Readable Bengali for UI text and inputs */
 .font-bangla-body,
 input:lang(bn),

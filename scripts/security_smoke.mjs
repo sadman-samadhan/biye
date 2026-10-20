@@ -129,6 +129,10 @@ async function appProbes() {
     await probe(`PATCH /api/sites/x/content (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/content`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"section":"hero","data":{}}' })
     await probe(`PATCH /api/sites/x/settings (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/settings`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"status":"live"}' })
     await probe(`POST /api/admin/sites/x/members (${label})`, `${BASE}/api/admin/sites/00000000-0000-0000-0000-000000000000/members`, { method: 'POST', headers: { ...headers, ...json }, body: '{"email":"a@b.co"}' })
+    await probe(`GET /api/sites/x/access (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/access`, { headers })
+    await probe(`PATCH /api/sites/x/access (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/access`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"siteAccess":"public"}' })
+    await probe(`POST /api/sites/x/access/passcode (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/access/passcode`, { method: 'POST', headers: { ...headers, ...json }, body: '{"passcode":"attacker-1234"}' })
+    await probe(`POST /api/sites/x/access/revoke (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/access/revoke`, { method: 'POST', headers: { ...headers, ...json }, body: '{}' })
     await probe(`POST /api/sites/x/palette (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/palette`, { method: 'POST', headers: { ...headers, ...json }, body: '{"media":"media:00000000-0000-0000-0000-000000000000"}' })
   }
   await probe('GET /admin redirects to login', `${BASE}/admin`)

@@ -53,7 +53,7 @@ export default async function DashboardHome() {
                   <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${status.className}`}>{status.text}</span>
                 </div>
                 <div className="mt-5 flex flex-wrap gap-2 text-sm">
-                  <Link href={`/s/${site.slug}`} className="rounded-lg border border-[#E2D8C9] px-3 py-1.5 hover:bg-[#FBF6EE]">
+                  <Link href={`/${site.slug}`} className="rounded-lg border border-[#E2D8C9] px-3 py-1.5 hover:bg-[#FBF6EE]">
                     View site
                   </Link>
                 </div>

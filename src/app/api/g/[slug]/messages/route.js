@@ -18,6 +18,7 @@ export async function GET(req, { params }) {
   const { slug } = await params
   const found = await getSiteForRequest(slug)
   if (!found) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (!found.canView(found.scope)) return NextResponse.json({ error: 'Passcode required' }, { status: 401 })
   const { site } = found
   if (isDemoSiteId(site.id) || !isSupabaseConfigured()) return NextResponse.json({ messages: [] })
 
@@ -41,6 +42,7 @@ export async function POST(req, { params }) {
   if (!found || (found.status !== 'live' && !found.viewer.canPreview)) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
+  if (!found.canView(found.scope)) return NextResponse.json({ error: 'Passcode required' }, { status: 401 })
   const { site } = found
 
   const body = await req.json().catch(() => null)

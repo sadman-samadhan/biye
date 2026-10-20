@@ -159,7 +159,7 @@ function Table({ sites }) {
                         <Button size="sm" href={`/admin/sites/${site.id}`}>
                           Edit
                         </Button>
-                        <Button size="sm" variant="ghost" icon={ExternalLink} href={`/s/${site.slug}`} target="_blank" aria-label={`View ${site.slug}`} />
+                        <Button size="sm" variant="ghost" icon={ExternalLink} href={`/${site.slug}`} target="_blank" aria-label={`View ${site.slug}`} />
                         <Button size="sm" variant="ghost" icon={Trash2} aria-label={`Move ${site.slug} to Trash`} disabled={busy === site.id} onClick={() => trash(site)} />
                       </>
                     )}

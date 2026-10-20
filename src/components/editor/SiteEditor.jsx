@@ -17,6 +17,7 @@ import LookPanel from './panels/LookPanel'
 import MonogramPanel from './panels/MonogramPanel'
 import FooterPanel from './panels/FooterPanel'
 import MessagesPanel from './panels/MessagesPanel'
+import AccessPanel from './panels/AccessPanel'
 import AdminSettingsPanel from './panels/AdminSettingsPanel'
 import MembersPanel from './panels/MembersPanel'
 
@@ -31,6 +32,7 @@ const PANELS = [
   { key: 'gallery', group: 'Content', label: 'Gallery', Component: GalleryPanel },
   { key: 'blessings', group: 'Content', label: 'Blessings', Component: BlessingsPanel },
   { key: 'footer', group: 'Content', label: 'Closing & contact', Component: FooterPanel },
+  { key: 'access', group: 'Guests', label: 'Privacy & sharing', Component: AccessPanel },
   { key: 'messages', group: 'Guests', label: 'Guestbook', Component: MessagesPanel },
   { key: 'settings', group: 'Operator', label: 'Site settings', Component: AdminSettingsPanel, adminOnly: true },
   { key: 'members', group: 'Operator', label: 'Couple access', Component: MembersPanel, adminOnly: true },
@@ -115,7 +117,7 @@ function LoadedEditor({ siteId, mode, data, saveContent, saveSettings, setMessag
           </div>
           <p className="mt-0.5 text-sm text-sb-muted">shubhobiye.com/{data.site.slug}</p>
         </div>
-        <Button href={`/s/${data.site.slug}`} target="_blank" icon={ExternalLink}>
+        <Button href={`/${data.site.slug}`} target="_blank" icon={ExternalLink}>
           View site
         </Button>
       </div>

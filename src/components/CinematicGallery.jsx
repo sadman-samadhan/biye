@@ -18,7 +18,7 @@ const DEFAULT_CATEGORIES = [
 
 const ITEMS_PER_PAGE = 12
 
-export default function CinematicGallery({ images: propImages }) {
+export default function CinematicGallery({ images: propImages, viewerName = null }) {
   const allImages = useMemo(() => {
     if (propImages && Array.isArray(propImages) && propImages.length > 0) {
       return propImages.map((img, idx) => ({
@@ -222,14 +222,27 @@ export default function CinematicGallery({ images: propImages }) {
                 onClick={(e) => e.stopPropagation()}
                 className="relative max-w-5xl max-h-[90vh] overflow-hidden flex flex-col items-center"
               >
-                <Image
-                  src={selectedImage.src}
-                  alt={selectedImage.alt}
-                  width={selectedImage.width}
-                  height={selectedImage.height}
-                  className="max-h-[80vh] w-auto object-contain rounded-sm"
-                  quality={95}
-                />
+                <div className="relative">
+                  <Image
+                    src={selectedImage.src}
+                    alt={selectedImage.alt}
+                    width={selectedImage.width}
+                    height={selectedImage.height}
+                    className="max-h-[80vh] w-auto object-contain rounded-sm"
+                    quality={95}
+                    draggable={false}
+                  />
+                  {/* Transparent shield: the browser's "save image" target is this div, not the photo */}
+                  <div aria-hidden="true" className="absolute inset-0" data-media />
+                  {viewerName && (
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute bottom-3 right-3 select-none rounded bg-black/25 px-2 py-1 font-body text-[11px] tracking-wide text-white/75"
+                    >
+                      Shared with {viewerName}
+                    </span>
+                  )}
+                </div>
                 <div className="mt-4 text-center">
                   <p className="font-body text-xs uppercase tracking-[0.2em] text-white/60">
                     {selectedImage.category}

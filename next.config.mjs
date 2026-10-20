@@ -34,7 +34,11 @@ const nextConfig = {
     ],
   },
   async redirects() {
-    return [{ source: '/admin/login', destination: '/login', permanent: true }]
+    return [
+      { source: '/admin/login', destination: '/login', permanent: true },
+      // Wedding sites moved from /s/{slug} to /{slug}
+      { source: '/s/:path*', destination: '/:path*', permanent: true },
+    ]
   },
   async headers() {
     return [
@@ -43,7 +47,6 @@ const nextConfig = {
       { source: '/dashboard/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
       { source: '/login', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
       { source: '/api/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
-      { source: '/s/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noimageindex' }] },
     ]
   },
 }
