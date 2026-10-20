@@ -74,7 +74,7 @@ export default function PageLoader() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="font-display text-4xl md:text-5xl text-graphite tracking-tight mb-4"
             >
-              AmarBiye
+              ShubhoBiye
             </motion.h1>
 
             <div className="relative w-48 mx-auto h-[1.5px] bg-warm-grey overflow-hidden rounded-full my-4">

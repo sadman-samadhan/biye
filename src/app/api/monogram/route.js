@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/server/admin-session'
+import { requireAdmin } from '@/lib/server/auth'
 import { generateMonogram } from '@/lib/monogramGenerator'
 import { uploadSiteImage } from '@/lib/storage'
-import { isSupabaseConfigured } from '@/lib/supabase'
+import { isSupabaseConfigured } from '@/lib/server/supabase'
 
 export async function POST(req) {
   const denied = await requireAdmin()
@@ -35,7 +35,7 @@ export async function POST(req) {
     let uploadedUrl = null
 
     // If siteId provided and Supabase is configured, upload to storage
-    if (siteId && isSupabaseConfigured) {
+    if (siteId && isSupabaseConfigured()) {
       try {
         const uploadRes = await uploadSiteImage(buffer, {
           siteId,

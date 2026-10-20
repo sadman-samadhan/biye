@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import Image from 'next/image'
-import { getAllGalleryImages, getImagePath } from '@/lib/getData'
+import { getImagePath } from '@/lib/media'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 
@@ -32,7 +32,7 @@ export default function CinematicGallery({ images: propImages }) {
         caption: img.caption || ''
       }))
     }
-    return getAllGalleryImages()
+    return []
   }, [propImages])
 
   const [activeCategory, setActiveCategory] = useState('all')

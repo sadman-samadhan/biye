@@ -46,7 +46,7 @@ export default function DesignPhilosophy() {
               Theoretical Intervention
             </h2>
             <p className="font-body text-lg text-graphite/80 leading-relaxed mb-6">
-              The AmarBiye wedding platform is more than a celebratory digital space; it is a 
+              The ShubhoBiye wedding platform is more than a celebratory digital space; it is a 
               <strong> cultural and design celebration</strong> in interface craftsmanship. By building a 
               multilingual platform that honors Bangla and English alongside sacred scriptural traditions, 
               we craft digital heirlooms that honor heritage with modern cinematic aesthetics.

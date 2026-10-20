@@ -3,7 +3,6 @@
 import { motion, AnimatePresence, useScroll } from 'framer-motion'
 import { useState, useEffect, useMemo } from 'react'
 import { playHoverSound, playClickSound, initAudio } from '@/lib/sounds'
-import { getHeroContent } from '@/lib/getData'
 import { useRouter, usePathname } from 'next/navigation'
 
 export default function Navigation({ heroData: propHeroData, ceremonies: propCeremonies }) {
@@ -12,7 +11,7 @@ export default function Navigation({ heroData: propHeroData, ceremonies: propCer
   const [lastScrollY, setLastScrollY] = useState(0)
   const [activeSection, setActiveSection] = useState('home')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const heroData = propHeroData || getHeroContent()
+  const heroData = propHeroData || {}
   const router = useRouter()
   const pathname = usePathname()
 

@@ -20,13 +20,25 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-      }
+      },
+      // Local Supabase stack (npm run db:start)
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '54321',
+        pathname: '/storage/v1/object/public/**',
+      },
     ],
+  },
+  async redirects() {
+    return [{ source: '/admin/login', destination: '/login', permanent: true }]
   },
   async headers() {
     return [
       { source: '/:path*', headers: securityHeaders },
       { source: '/admin/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+      { source: '/dashboard/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+      { source: '/login', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
       { source: '/api/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
       { source: '/s/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow, noimageindex' }] },
     ]

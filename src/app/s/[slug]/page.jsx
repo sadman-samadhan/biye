@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
-import { getSiteBySlug, getSiteContent } from '@/lib/getData'
-import { isAdminRequest } from '@/lib/server/admin-session'
+import { getSiteContent } from '@/lib/server/site-data'
+import { getSiteForRequest } from '@/lib/server/site-view'
 
 import Navigation from '@/components/Navigation'
 import ScrollProgress from '@/components/ScrollProgress'
@@ -19,11 +19,12 @@ import Footer from '@/components/Footer'
 export default async function WeddingSitePage({ params }) {
   const { slug } = await params
 
-  // Drafts and archived sites are visible to signed-in operators only
-  const site = await getSiteBySlug(slug, await isAdminRequest())
-  if (!site) {
+  // Drafts, trash and expired sites are visible to the couple and operators only
+  const found = await getSiteForRequest(slug)
+  if (!found) {
     notFound()
   }
+  const { site, status, viewer } = found
 
   const siteContent = await getSiteContent(site.id)
   const heroData = siteContent?.content?.hero
@@ -38,12 +39,14 @@ export default async function WeddingSitePage({ params }) {
 
   return (
     <>
-      {site.status !== 'live' && (
+      {status !== 'live' && (
         <aside aria-label="Draft mode banner" className="bg-amber-500/90 text-black px-4 py-2 text-center text-xs font-medium tracking-wide sticky top-0 z-[9999] backdrop-blur-md flex items-center justify-center gap-2 shadow-md">
-          <span>⚠️ <strong>{site.status === 'archived' ? 'In Trash' : 'Draft Mode'}</strong> — Only operators can see this site. Guests get a 404.</span>
-          <a href={`/admin/sites/${site.id}`} className="underline font-bold ml-2 hover:opacity-80">
-            Publish Live in Admin →
-          </a>
+          <span>⚠️ <strong>{status === 'archived' ? 'In Trash' : status === 'expired' ? 'Expired' : 'Draft'}</strong> — Only you can see this site. Guests get a 404.</span>
+          {viewer.isAdmin && (
+            <a href={`/admin/sites/${site.id}`} className="underline font-bold ml-2 hover:opacity-80">
+              Open in Admin →
+            </a>
+          )}
         </aside>
       )}
       <Navigation heroData={heroData} ceremonies={ceremonies.filter(c => c.enabled !== false)} />
@@ -133,6 +136,8 @@ export default async function WeddingSitePage({ params }) {
       <Footer
         footerData={footerData}
         siteName={coupleNames}
+        contactEmail={site.public_contact?.email}
+        contactPhone={site.public_contact?.whatsapp || site.public_contact?.phone}
       />
     </>
   )

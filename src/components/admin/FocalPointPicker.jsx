@@ -44,7 +44,7 @@ export function parseFocalPoint(posStr) {
 }
 
 /**
- * Visual Viewfinder Crop Rectangle & Focal Point Picker for AmarBiye
+ * Visual Viewfinder Crop Rectangle & Focal Point Picker for ShubhoBiye
  */
 export default function FocalPointPicker({
   value = '50% 50%',

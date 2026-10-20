@@ -1,5 +1,5 @@
 /**
- * Seed Script: Rafa & Shawon Demo Site for AmarBiye
+ * Seed Script: Rafa & Shawon Demo Site for ShubhoBiye
  * 
  * Usage:
  *   node scripts/seed_demo.js
@@ -90,7 +90,7 @@ async function seed() {
         status: 'live',
         wedding_type: 'muslim',
         template_id: 'classic',
-        owner_name: 'AmarBiye Demo',
+        owner_name: 'ShubhoBiye Demo',
         palette: classicPalette,
         updated_at: new Date().toISOString()
       })
@@ -109,7 +109,7 @@ async function seed() {
         status: 'live',
         wedding_type: 'muslim',
         template_id: 'classic',
-        owner_name: 'AmarBiye Demo',
+        owner_name: 'ShubhoBiye Demo',
         palette: classicPalette,
         palette_options: [classicPalette],
         selected_palette_index: 0

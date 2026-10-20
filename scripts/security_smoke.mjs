@@ -83,12 +83,26 @@ async function supabaseProbes() {
   })
 }
 
+// A session whose JWT is signed with the wrong key must not be accepted
+const SUPABASE_REF = SUPABASE_URL ? (new URL(SUPABASE_URL).hostname.split('.')[0] || '127') : 'x'
+const FORGED_SESSION = {
+  access_token: [
+    Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url'),
+    Buffer.from(JSON.stringify({ sub: crypto.randomUUID(), role: 'authenticated', app_metadata: { role: 'admin' }, exp: 4102444800 })).toString('base64url'),
+    'forged-signature',
+  ].join('.'),
+  refresh_token: 'forged',
+  token_type: 'bearer',
+  expires_at: 4102444800,
+  user: { id: crypto.randomUUID(), app_metadata: { role: 'admin' } },
+}
+
 async function appProbes() {
   const json = { 'Content-Type': 'application/json' }
   const forged = [
     ['no cookie', {}],
-    ['forged shb_admin', { Cookie: 'shb_admin=authenticated' }],
     ['legacy amarbiye cookie', { Cookie: 'amarbiye_admin_session=authenticated' }],
+    ['forged supabase session', { Cookie: `sb-${SUPABASE_REF}-auth-token=base64-${Buffer.from(JSON.stringify(FORGED_SESSION)).toString('base64url')}` }],
   ]
   for (const [label, headers] of forged) {
     await probe(`GET /api/admin/sites (${label})`, `${BASE}/api/admin/sites`, { headers })
@@ -97,9 +111,14 @@ async function appProbes() {
     await probe(`PUT /api/admin/messages/x (${label})`, `${BASE}/api/admin/messages/x`, { method: 'PUT', headers: { ...headers, ...json }, body: '{"approved":true}' })
     await probe(`POST /api/upload (${label})`, `${BASE}/api/upload`, { method: 'POST', headers, body: new FormData() })
     await probe(`POST /api/monogram (${label})`, `${BASE}/api/monogram`, { method: 'POST', headers: { ...headers, ...json }, body: '{}' })
+    await probe(`GET /api/sites/x (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000`, { headers })
+    await probe(`PATCH /api/sites/x/content (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/content`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"section":"hero","data":{}}' })
+    await probe(`PATCH /api/sites/x/settings (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/settings`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"status":"live"}' })
+    await probe(`POST /api/admin/sites/x/members (${label})`, `${BASE}/api/admin/sites/00000000-0000-0000-0000-000000000000/members`, { method: 'POST', headers: { ...headers, ...json }, body: '{"email":"a@b.co"}' })
     await probe(`POST /api/palette (${label})`, `${BASE}/api/palette`, { method: 'POST', headers: { ...headers, ...json }, body: '{"imageUrl":"/../.env.local"}' })
   }
   await probe('GET /admin redirects to login', `${BASE}/admin`)
+  await probe('GET /dashboard redirects to login', `${BASE}/dashboard`)
 }
 
 await supabaseProbes()

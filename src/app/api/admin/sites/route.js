@@ -1,158 +1,123 @@
 import { NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/server/admin-session'
-import { getSupabaseAdmin, isSupabaseConfigured } from '@/lib/supabase'
-import { DEMO_SITE } from '@/lib/getData'
+import { assertSameOrigin, getCurrentUser, requireAdmin } from '@/lib/server/auth'
+import { isSupabaseConfigured, serviceClient } from '@/lib/server/supabase'
+import { writeAudit } from '@/lib/server/site-data'
+import { slugify, slugProblem } from '@/lib/slugs'
+import { validateSection, validateSettings, CONTENT_SECTIONS } from '@/lib/content/schema'
+import { normalizePalette } from '@/lib/palettes'
 import { generateMonogram } from '@/lib/monogramGenerator'
 import { uploadSiteImage } from '@/lib/storage'
+
+const notConfigured = () => NextResponse.json({ error: 'Database is not configured' }, { status: 503 })
 
 export async function GET() {
   const denied = await requireAdmin()
   if (denied) return denied
+  if (!isSupabaseConfigured()) return notConfigured()
 
-  if (!isSupabaseConfigured) {
-    // Return demo site in offline / mock mode
-    return NextResponse.json({
-      sites: [DEMO_SITE]
-    })
-  }
+  const { data, error } = await serviceClient()
+    .from('sites')
+    .select('id, slug, status, wedding_type, template_id, palette, owner_name, owner_email, owner_phone, plan, products, plan_expiry_date, created_at, updated_at')
+    .order('created_at', { ascending: false })
 
-  try {
-    const supabase = getSupabaseAdmin()
-    const { data, error } = await supabase
-      .from('sites')
-      .select('*')
-      .order('created_at', { ascending: false })
-
-    if (error) throw error
-
-    return NextResponse.json({ sites: data || [] })
-  } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
-  }
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ sites: data || [] })
 }
 
 export async function POST(req) {
-  const denied = await requireAdmin()
+  const denied = (await requireAdmin()) || (await assertSameOrigin())
   if (denied) return denied
+  if (!isSupabaseConfigured()) return notConfigured()
 
-  try {
-    const body = await req.json()
-    const {
-      slug,
-      status = 'draft',
-      wedding_type = 'muslim',
-      template_id = 'classic',
-      palette,
-      palette_options = [],
-      selected_palette_index = 0,
-      owner_name,
-      owner_email,
-      owner_phone,
-      content = {},
-      ceremonies = [],
-      duas = { duas: [], parentBlessings: {} },
-      gallery = []
-    } = body
+  const body = await req.json().catch(() => null)
+  if (!body) return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
 
-    if (!slug) {
-      return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
-    }
+  const slug = slugify(body.slug)
+  const problem = slugProblem(slug)
+  if (problem) return NextResponse.json({ error: problem }, { status: 400 })
 
-    // Clean slug
-    const cleanSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '-')
+  const settings = validateSettings(
+    {
+      ...(body.palette ? { palette: body.palette } : {}),
+      ...(body.palette_options ? { palette_options: body.palette_options } : {}),
+      ...(body.selected_palette_index !== undefined ? { selected_palette_index: body.selected_palette_index } : {}),
+      wedding_type: body.wedding_type || 'muslim',
+      ...(body.template_id ? { template_id: body.template_id } : {}),
+      status: body.status || 'draft',
+      ...(body.plan ? { plan: body.plan } : {}),
+      ...(body.products ? { products: body.products } : {}),
+      owner_name: body.owner_name || null,
+      owner_email: body.owner_email || '',
+      owner_phone: body.owner_phone || null,
+    },
+    { isAdmin: true }
+  )
+  if (!settings.ok) return NextResponse.json({ error: 'Invalid site settings', issues: settings.issues }, { status: 400 })
 
-    if (!isSupabaseConfigured) {
-      return NextResponse.json({
-        success: true,
-        message: 'Mock creation (Supabase not configured in .env.local)',
-        site: { id: 'mock-' + Date.now(), slug: cleanSlug, owner_name, status, wedding_type }
-      })
-    }
-
-    const supabase = getSupabaseAdmin()
-
-    // 1. Insert into sites table (try with wedding_type, fallback without if column absent)
-    let site = null
-    const siteDataWithTradition = {
-      slug: cleanSlug,
-      status,
-      wedding_type,
-      template_id,
-      palette: palette || {},
-      palette_options,
-      selected_palette_index,
-      owner_name,
-      owner_email,
-      owner_phone
-    }
-
-    let insertRes = await supabase
-      .from('sites')
-      .insert(siteDataWithTradition)
-      .select()
-      .single()
-
-    if (insertRes.error && insertRes.error.message?.includes('wedding_type')) {
-      // Column might not exist in current migration yet; retry without it
-      const { wedding_type: _, ...siteDataWithout } = siteDataWithTradition
-      insertRes = await supabase
-        .from('sites')
-        .insert(siteDataWithout)
-        .select()
-        .single()
-    }
-
-    if (insertRes.error) {
-      throw insertRes.error
-    }
-    site = insertRes.data
-
-    // 2. Dynamic Monogram Generation (if not already set)
-    let finalContent = { ...content, wedding_type }
-    if (!finalContent.logoUrl && finalContent.sectionToggles?.monogram !== false) {
-      try {
-        const rawNames = finalContent?.hero?.coupleNames?.en || owner_name || 'Bride & Groom'
-        const names = rawNames.includes('&') ? rawNames.split('&').map(s => s.trim()) : [rawNames, '']
-        const monogramBuf = await generateMonogram({
-          name1: names[0] || 'Bride',
-          name2: names[1] || 'Groom',
-          blessingText: finalContent?.blessing?.en || finalContent?.hero?.blessing?.en,
-          verseSnippet: finalContent?.blessing?.reference || finalContent?.hero?.blessing?.reference,
-          venue: ceremonies[0]?.venue?.en || '',
-          weddingType: wedding_type
-        })
-
-        const uploadRes = await uploadSiteImage(monogramBuf, {
-          siteId: site.id,
-          category: 'monogram',
-          filename: 'wedding_monogram.png'
-        })
-        if (uploadRes?.publicUrl) {
-          finalContent.logoUrl = uploadRes.publicUrl
-        } else {
-          finalContent.logoUrl = `data:image/png;base64,${monogramBuf.toString('base64')}`
-        }
-      } catch (monoErr) {
-        console.warn('Auto monogram generation skipped:', monoErr.message)
-      }
-    }
-
-    // 3. Insert into site_content table
-    const { error: contentError } = await supabase
-      .from('site_content')
-      .insert({
-        site_id: site.id,
-        content: finalContent,
-        ceremonies,
-        duas,
-        gallery
-      })
-
-    if (contentError) throw contentError
-
-    return NextResponse.json({ success: true, site })
-  } catch (err) {
-    console.error('Error creating site:', err)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+  // Content arrives as one blob from the intake form; validate each known section.
+  const content = {}
+  for (const [key, value] of Object.entries(body.content || {})) {
+    if (value === undefined || value === null) continue
+    if (!CONTENT_SECTIONS.has(key)) continue
+    const result = validateSection(key, value)
+    if (!result.ok) return NextResponse.json({ error: `Invalid ${key}`, issues: result.issues }, { status: 400 })
+    content[key] = result.data
   }
+  const columns = {}
+  for (const key of ['ceremonies', 'duas', 'gallery']) {
+    if (body[key] === undefined) continue
+    const result = validateSection(key, body[key])
+    if (!result.ok) return NextResponse.json({ error: `Invalid ${key}`, issues: result.issues }, { status: 400 })
+    columns[key] = result.data
+  }
+
+  const supabase = serviceClient()
+  const { data: site, error } = await supabase
+    .from('sites')
+    .insert({ slug, ...settings.data, palette: settings.data.palette || normalizePalette(null) })
+    .select()
+    .single()
+
+  if (error) {
+    const duplicate = error.code === '23505'
+    return NextResponse.json({ error: duplicate ? `The address "${slug}" is already taken` : error.message }, { status: duplicate ? 409 : 500 })
+  }
+
+  // Auto-generate a monogram unless one was supplied or the section is off
+  if (!content.logoUrl && content.sectionToggles?.monogram !== false) {
+    try {
+      const rawNames = content.hero?.coupleNames?.en || body.owner_name || 'Bride & Groom'
+      const names = rawNames.includes('&') ? rawNames.split('&').map((s) => s.trim()) : [rawNames, '']
+      const monogram = await generateMonogram({
+        name1: names[0] || 'Bride',
+        name2: names[1] || 'Groom',
+        blessingText: content.blessing?.en || content.hero?.blessing?.en,
+        verseSnippet: content.blessing?.reference || content.hero?.blessing?.reference,
+        venue: columns.ceremonies?.[0]?.venue?.en || '',
+        weddingType: settings.data.wedding_type,
+      })
+      const uploaded = await uploadSiteImage(monogram, { siteId: site.id, category: 'monogram', filename: 'wedding_monogram.png' })
+      if (uploaded?.publicUrl) content.logoUrl = uploaded.publicUrl
+    } catch (err) {
+      console.warn('Auto monogram generation skipped:', err.message)
+    }
+  }
+
+  const { error: contentError } = await supabase.from('site_content').insert({
+    site_id: site.id,
+    content: { ...content, wedding_type: settings.data.wedding_type },
+    ceremonies: columns.ceremonies || [],
+    duas: columns.duas || { duas: [], parentBlessings: {} },
+    gallery: columns.gallery || [],
+  })
+  const { error: accessError } = await supabase.from('site_access').insert({ site_id: site.id })
+
+  if (contentError || accessError) {
+    await supabase.from('sites').delete().eq('id', site.id)
+    return NextResponse.json({ error: (contentError || accessError).message }, { status: 500 })
+  }
+
+  const user = await getCurrentUser()
+  await writeAudit({ actorKind: 'admin', actorId: user?.id, siteId: site.id, action: 'site.create', meta: { slug } })
+  return NextResponse.json({ success: true, site })
 }

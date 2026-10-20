@@ -601,7 +601,7 @@ export default function EditSitePage({ params }) {
         reference: formData.blessingRef
       },
       footer: {
-        copyright: `© 2026 ${formData.coupleNamesEn || 'AmarBiye'}. All rights reserved.`
+        copyright: `© 2026 ${formData.coupleNamesEn || 'ShubhoBiye'}. All rights reserved.`
       }
     }
 
@@ -2142,7 +2142,7 @@ export default function EditSitePage({ params }) {
                 type="email"
                 value={formData.ownerEmail}
                 onChange={(e) => setFormData(p => ({ ...p, ownerEmail: e.target.value }))}
-                placeholder="info@amarbiye.com"
+                placeholder="info@shubhobiye.com"
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#D4A574]"
               />
             </div>

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/server/admin-session'
+import { requireAdmin } from '@/lib/server/auth'
 import { uploadSiteImage, uploadSiteVideo } from '@/lib/storage'
 
 const MAX_IMAGE_BYTES = 25 * 1024 * 1024

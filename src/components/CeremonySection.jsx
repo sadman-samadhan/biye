@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { AnimatePresence, motion, useScroll, useTransform, useInView } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { getImagePath } from '@/lib/getData'
+import { getImagePath } from '@/lib/media'
 import { blurReveal, staggerContainer } from '@/lib/animations'
 import SectionDivider from './SectionDivider'
 

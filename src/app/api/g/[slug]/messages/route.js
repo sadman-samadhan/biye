@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server'
-import { getSupabaseAdmin, isSupabaseConfigured } from '@/lib/supabase'
-import { getSiteBySlug, isDemoSiteId } from '@/lib/getData'
-import { clientIp, hitLimit } from '@/lib/server/rate-limit'
+import { isSupabaseConfigured, serviceClient } from '@/lib/server/supabase'
+import { getSiteAccess } from '@/lib/server/site-data'
+import { getSiteForRequest } from '@/lib/server/site-view'
+import { isDemoSiteId } from '@/lib/demo'
+import { assertSameOrigin } from '@/lib/server/auth'
+import { clientKey, rateLimitHit } from '@/lib/server/rate-limit'
 
-const POST_LIMIT = { limit: 5, windowMs: 10 * 60 * 1000 }
+const POST_LIMIT = { limit: 5, windowS: 10 * 60 }
 
 function clean(value, max) {
   if (typeof value !== 'string') return null
@@ -11,17 +14,14 @@ function clean(value, max) {
   return trimmed ? trimmed.slice(0, max) : null
 }
 
-async function findPublicSite(params) {
-  const { slug } = await params
-  return getSiteBySlug(slug, false)
-}
-
 export async function GET(req, { params }) {
-  const site = await findPublicSite(params)
-  if (!site) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  if (isDemoSiteId(site.id) || !isSupabaseConfigured) return NextResponse.json({ messages: [] })
+  const { slug } = await params
+  const found = await getSiteForRequest(slug)
+  if (!found) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  const { site } = found
+  if (isDemoSiteId(site.id) || !isSupabaseConfigured()) return NextResponse.json({ messages: [] })
 
-  const { data, error } = await getSupabaseAdmin()
+  const { data } = await serviceClient()
     .from('messages')
     .select('id, name, name_bn, message, message_bn, created_at')
     .eq('site_id', site.id)
@@ -29,20 +29,22 @@ export async function GET(req, { params }) {
     .order('created_at', { ascending: false })
     .limit(50)
 
-  if (error) return NextResponse.json({ messages: [] })
-  return NextResponse.json({ messages: data || [] })
+  return NextResponse.json({ messages: data || [] }, { headers: { 'Cache-Control': 'private, no-store' } })
 }
 
 export async function POST(req, { params }) {
-  const site = await findPublicSite(params)
-  if (!site) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-
-  let body
-  try {
-    body = await req.json()
-  } catch {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+  const crossOrigin = await assertSameOrigin()
+  if (crossOrigin) return crossOrigin
+  const { slug } = await params
+  const found = await getSiteForRequest(slug)
+  // Guests may only write to live sites (operators previewing a draft can test the form)
+  if (!found || (found.status !== 'live' && !found.viewer.canPreview)) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
+  const { site } = found
+
+  const body = await req.json().catch(() => null)
+  if (!body) return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
 
   // Honeypot: real visitors never see or fill this field.
   if (body.website) return NextResponse.json({ success: true })
@@ -53,26 +55,26 @@ export async function POST(req, { params }) {
     return NextResponse.json({ error: 'Name and message are required' }, { status: 400 })
   }
 
-  const { allowed } = hitLimit(`msg:${site.id}:${clientIp(req)}`, POST_LIMIT)
-  if (!allowed) {
+  if (!(await rateLimitHit(`msg:${site.id}:${await clientKey()}`, POST_LIMIT))) {
     return NextResponse.json({ error: 'Too many messages. Please wait a few minutes.' }, { status: 429 })
   }
 
-  if (isDemoSiteId(site.id) || !isSupabaseConfigured) {
+  if (isDemoSiteId(site.id) || !isSupabaseConfigured()) {
     return NextResponse.json({ success: true, demo: true })
   }
 
-  const { error } = await getSupabaseAdmin()
-    .from('messages')
-    .insert({
-      site_id: site.id,
-      name,
-      name_bn: clean(body.nameBn, 50),
-      message,
-      message_bn: clean(body.messageBn, 300),
-      approved: true,
-    })
+  const access = await getSiteAccess(site.id)
+  const approved = (access?.message_moderation || 'auto') === 'auto'
+
+  const { error } = await serviceClient().from('messages').insert({
+    site_id: site.id,
+    name,
+    name_bn: clean(body.nameBn, 50),
+    message,
+    message_bn: clean(body.messageBn, 300),
+    approved,
+  })
 
   if (error) return NextResponse.json({ error: 'Unable to save message' }, { status: 500 })
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, pendingApproval: !approved })
 }

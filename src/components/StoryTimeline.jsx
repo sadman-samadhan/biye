@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { getStoryMilestones, getImagePath } from '@/lib/getData'
+import { getImagePath } from '@/lib/media'
 
 function isBangla(text) {
   return /[\u0980-\u09FF]/.test(text || '')
@@ -31,7 +31,7 @@ function TimelineMoment({ moment, index }) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-graphite/30 italic">
-              AmarBiye Story
+              ShubhoBiye Story
             </div>
           )}
         </div>
@@ -76,7 +76,7 @@ function TimelineMoment({ moment, index }) {
 }
 
 export default function StoryTimeline({ storyData: propData }) {
-  const storyData = propData || getStoryMilestones()
+  const storyData = propData || { milestones: [] }
   if (!storyData || !storyData.milestones?.length) return null
 
   const headerTitleBn = storyData?.title?.bn || storyData?.title?.ur || ''

@@ -35,7 +35,7 @@ export default function AdminDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl md:text-4xl text-white font-semibold tracking-tight">
-            AmarBiye Dashboard
+            ShubhoBiye Dashboard
           </h1>
           <p className="text-zinc-400 text-sm mt-1">
             Operator Console • Manage client wedding sites & intake pipeline

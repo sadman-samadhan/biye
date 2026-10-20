@@ -2,11 +2,11 @@
 
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion'
 import { useRef } from 'react'
-import { getHeroContent, getVideoPath, getImagePath } from '@/lib/getData'
+import { getVideoPath, getImagePath } from '@/lib/media'
 
 export default function VideoHero({ heroData: propHeroData, weddingType = 'muslim' }) {
   const containerRef = useRef(null)
-  const heroData = propHeroData || getHeroContent()
+  const heroData = propHeroData || {}
   
   const { scrollYProgress } = useScroll({
     target: containerRef,

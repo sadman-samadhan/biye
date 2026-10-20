@@ -3,7 +3,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import Image from 'next/image'
-import { getImagePath } from '@/lib/getData'
+import { getImagePath } from '@/lib/media'
 
 export default function LogoReveal({ logoUrl, coupleNames, blessingData, weddingType = 'muslim' }) {
   const containerRef = useRef(null)

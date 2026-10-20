@@ -1,5 +1,5 @@
 {
-  "name": "amarbiye",
+  "name": "shubhobiye",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,10 +11,12 @@
     "smoke:security": "node --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local scripts/security_smoke.mjs",
     "db:start": "supabase start -x studio,imgproxy,edge-runtime,logflare,vector,realtime,supavisor,postgres-meta",
     "db:stop": "supabase stop",
-    "db:reset": "supabase db reset"
+    "db:reset": "supabase db reset",
+    "admin:make": "node --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local scripts/make_admin.mjs"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.0.9",
+    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.93.2",
     "framer-motion": "^12.29.2",
     "jose": "^6.2.13",
@@ -23,9 +25,11 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "server-only": "^0.0.1",
-    "sharp": "^0.35.4"
+    "sharp": "^0.35.4",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/postcss": "^4",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",

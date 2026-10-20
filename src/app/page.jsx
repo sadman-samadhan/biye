@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import BrandLogo from '@/components/brand/BrandLogo'
+import DeveloperCredit from '@/components/brand/DeveloperCredit'
 import {
   Sparkles,
   ArrowRight,
@@ -13,14 +15,13 @@ import {
   ShieldCheck,
   Check,
   ExternalLink,
-  PhoneCall,
-  Crown
+  PhoneCall
 } from 'lucide-react'
 
 export default function LandingPage() {
   const WHATSAPP_NUMBER = '8801954638110'
   const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    "Hi AmarBiye! I'm interested in creating a bespoke wedding website."
+    "Hi ShubhoBiye! I'm interested in creating a bespoke wedding website."
   )}`
 
   return (
@@ -28,18 +29,8 @@ export default function LandingPage() {
       {/* 1. TOP NAVIGATION */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#0E0E10]/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 md:px-12 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#A67C52] via-[#D4A574] to-[#6B2C3E] flex items-center justify-center text-white shadow-lg shadow-[#A67C52]/20">
-              <Crown size={18} />
-            </div>
-            <div>
-              <span className="font-display text-2xl font-bold tracking-tight text-white block leading-none">
-                AmarBiye
-              </span>
-              <span className="font-bangla text-xs text-[#D4A574] font-medium block mt-0.5">
-                আমার বিয়ে
-              </span>
-            </div>
+          <Link href="/" className="flex items-center" aria-label="ShubhoBiye home">
+            <BrandLogo tone="dark" height={40} priority />
           </Link>
 
           <nav className="hidden md:flex items-center gap-8 text-xs font-body tracking-wider uppercase text-zinc-400">
@@ -59,10 +50,10 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/admin/login"
+              href="/login"
               className="text-xs text-zinc-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg hidden sm:block"
             >
-              Admin Portal
+              Sign in
             </Link>
 
             <a
@@ -175,7 +166,7 @@ export default function LandingPage() {
                       Live Demo Site
                     </h3>
                     <p className="text-xs text-zinc-300 font-body">
-                      Hosted at <code className="font-mono text-[#D4A574]">amarbiye.com/s/demo</code>
+                      Hosted at <code className="font-mono text-[#D4A574]">shubhobiye.com/s/demo</code>
                     </p>
                   </div>
 
@@ -291,7 +282,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto space-y-16">
           <div className="text-center space-y-3">
             <span className="font-body text-xs uppercase tracking-[0.3em] text-[#A67C52] font-semibold">
-              The AmarBiye Standard
+              The ShubhoBiye Standard
             </span>
             <h2 className="font-display text-4xl md:text-5xl text-white">
               Crafted With Uncompromising Luxury
@@ -388,7 +379,7 @@ export default function LandingPage() {
                   The Signature Wedding Heirloom
                 </h3>
                 <p className="text-xs text-zinc-400 mt-1">
-                  Full white-glove setup by the AmarBiye team within 24–48 hours.
+                  Full white-glove setup by the ShubhoBiye team within 24–48 hours.
                 </p>
               </div>
 
@@ -405,7 +396,7 @@ export default function LandingPage() {
             {/* Checklist */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-8">
               {[
-                'Personalized URL: amarbiye.com/s/your-slug',
+                'Personalized URL: shubhobiye.com/s/your-slug',
                 'Cinematic Video Hero & Background Ambient Music',
                 'Gemini AI Color Harmony extracted from your attire',
                 'Up to 4 Custom Ceremony Timelines (Akth, Holud, etc.)',
@@ -447,19 +438,18 @@ export default function LandingPage() {
       {/* 7. FOOTER */}
       <footer className="py-12 px-6 md:px-12 border-t border-white/10 text-zinc-500 text-xs">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <span className="font-display text-lg text-white font-medium">AmarBiye</span>
-            <span className="text-[#A67C52]">•</span>
-            <span className="font-bangla text-zinc-400">আমার বিয়ে</span>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <BrandLogo tone="dark" height={30} />
             <span className="text-zinc-600">© {new Date().getFullYear()}</span>
+            <DeveloperCredit tone="dark" className="text-zinc-400" />
           </div>
 
           <div className="flex items-center gap-6">
             <Link href="/s/demo" className="hover:text-white transition-colors">
               Live Showcase
             </Link>
-            <Link href="/admin/login" className="hover:text-white transition-colors">
-              Admin Login
+            <Link href="/login" className="hover:text-white transition-colors">
+              Sign in
             </Link>
             <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
               WhatsApp Support

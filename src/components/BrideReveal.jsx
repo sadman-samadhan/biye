@@ -3,10 +3,10 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import Image from 'next/image'
-import { getBrideRevealContent, getImagePath } from '@/lib/getData'
+import { getImagePath } from '@/lib/media'
 
 export default function BrideReveal({ brideRevealData: propData }) {
-  const revealData = propData || getBrideRevealContent()
+  const revealData = propData || {}
   const containerRef = useRef(null)
   
   const { scrollYProgress } = useScroll({
@@ -119,7 +119,7 @@ export default function BrideReveal({ brideRevealData: propData }) {
         className="absolute bottom-12 right-12 font-body text-[8px] text-white tracking-[1em] uppercase vertical-text hidden md:block"
         style={{ writingMode: 'vertical-rl' }}
       >
-        AmarBiye
+        ShubhoBiye
       </motion.div>
     </section>
   )

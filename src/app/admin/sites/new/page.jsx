@@ -701,7 +701,7 @@ export default function NewSiteIntakePage() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-xs uppercase tracking-[0.25em] text-[#D4A574] font-medium block mb-1">
-              AmarBiye Admin
+              ShubhoBiye Admin
             </span>
             <h1 className="text-2xl md:text-3xl font-display font-bold text-white tracking-tight">
               Create New Wedding Site
@@ -827,7 +827,7 @@ export default function NewSiteIntakePage() {
               </label>
               <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden focus-within:border-[#D4A574]">
                 <span className="px-3 text-xs text-zinc-500 bg-white/5 border-r border-white/5 py-3">
-                  amarbiye.com/s/
+                  shubhobiye.com/s/
                 </span>
                 <input
                   type="text"
@@ -2060,7 +2060,7 @@ export default function NewSiteIntakePage() {
                 type="email"
                 value={formData.ownerEmail}
                 onChange={(e) => setFormData(p => ({ ...p, ownerEmail: e.target.value }))}
-                placeholder="info@amarbiye.com"
+                placeholder="info@shubhobiye.com"
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-[#D4A574]"
               />
             </div>

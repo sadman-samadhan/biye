@@ -1,6 +1,5 @@
 import { Cormorant_Garamond, Inter, Amiri, Galada, Tiro_Devanagari_Sanskrit } from 'next/font/google'
 import './globals.css'
-import PageLoader from '@/components/PageLoader'
 
 const cormorant = Cormorant_Garamond({
   weight: ['400', '600', '700'],
@@ -39,11 +38,12 @@ const tiroSanskrit = Tiro_Devanagari_Sanskrit({
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  title: 'AmarBiye — Bespoke Digital Wedding Websites | আমার বিয়ে',
+  title: 'ShubhoBiye — Bespoke Digital Wedding Websites | শুভ বিয়ে',
   description: 'Create breathtaking, cinematic wedding websites for Bangladeshi & South Asian couples. Personalized color palettes, ceremony timelines, and digital guest blessings.',
   openGraph: {
-    title: 'AmarBiye — Bespoke Digital Wedding Websites',
+    title: 'ShubhoBiye — Bespoke Digital Wedding Websites',
     description: 'Transform your wedding into a timeless digital heirloom.',
+    images: [{ url: '/brand/shubhobiye/og.jpg', width: 1200, height: 630, alt: 'ShubhoBiye — শুভ বিয়ে' }],
   },
 }
 
@@ -51,7 +51,6 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable} ${amiri.variable} ${galada.variable} ${tiroSanskrit.variable}`}>
       <body className="antialiased bg-bone text-graphite">
-        <PageLoader />
         {children}
       </body>
     </html>

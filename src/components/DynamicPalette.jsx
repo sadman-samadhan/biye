@@ -21,7 +21,7 @@ export default function DynamicPalette({ palette }) {
 
   return (
     <style
-      id="amarbiye-dynamic-palette"
+      id="shubhobiye-palette"
       dangerouslySetInnerHTML={{ __html: css }}
     />
   )

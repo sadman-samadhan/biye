@@ -1,54 +1,28 @@
 import { NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/server/admin-session'
-import { getSupabaseAdmin, isSupabaseConfigured } from '@/lib/supabase'
+import { assertSameOrigin, requireAdmin } from '@/lib/server/auth'
+import { isSupabaseConfigured, serviceClient } from '@/lib/server/supabase'
 
 export async function PUT(req, { params }) {
-  const denied = await requireAdmin()
+  const denied = (await requireAdmin()) || (await assertSameOrigin())
   if (denied) return denied
+  if (!isSupabaseConfigured()) return NextResponse.json({ error: 'Database is not configured' }, { status: 503 })
+  const { id } = await params
 
-  const resolvedParams = await params
-  const id = resolvedParams?.id
+  const { approved } = await req.json().catch(() => ({}))
+  if (typeof approved !== 'boolean') return NextResponse.json({ error: 'approved must be true or false' }, { status: 400 })
 
-  try {
-    const { approved } = await req.json()
-    if (!isSupabaseConfigured) {
-      return NextResponse.json({ success: true })
-    }
-
-    const supabase = getSupabaseAdmin()
-    const { error } = await supabase
-      .from('messages')
-      .update({ approved })
-      .eq('id', id)
-
-    if (error) throw error
-    return NextResponse.json({ success: true })
-  } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
-  }
+  const { error } = await serviceClient().from('messages').update({ approved }).eq('id', id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ success: true })
 }
 
 export async function DELETE(req, { params }) {
-  const denied = await requireAdmin()
+  const denied = (await requireAdmin()) || (await assertSameOrigin())
   if (denied) return denied
+  if (!isSupabaseConfigured()) return NextResponse.json({ error: 'Database is not configured' }, { status: 503 })
+  const { id } = await params
 
-  const resolvedParams = await params
-  const id = resolvedParams?.id
-
-  try {
-    if (!isSupabaseConfigured) {
-      return NextResponse.json({ success: true })
-    }
-
-    const supabase = getSupabaseAdmin()
-    const { error } = await supabase
-      .from('messages')
-      .delete()
-      .eq('id', id)
-
-    if (error) throw error
-    return NextResponse.json({ success: true })
-  } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
-  }
+  const { error } = await serviceClient().from('messages').delete().eq('id', id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ success: true })
 }

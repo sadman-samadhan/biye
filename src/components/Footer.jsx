@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Mail, Phone, Heart } from 'lucide-react'
+import DeveloperCredit from '@/components/brand/DeveloperCredit'
 
 // Contact cards render only when the couple explicitly chose to publish contact details.
-export default function Footer({ footerData, siteName = 'AmarBiye', contactEmail, contactPhone }) {
+export default function Footer({ footerData, siteName = 'ShubhoBiye', contactEmail, contactPhone }) {
   const currentYear = new Date().getFullYear()
 
   const email = contactEmail || ''
@@ -114,15 +115,18 @@ export default function Footer({ footerData, siteName = 'AmarBiye', contactEmail
             className="flex flex-col md:flex-row justify-between items-center w-full max-w-4xl gap-4 font-body text-xs text-clay/60"
           >
             <p>&copy; {currentYear} {siteName}. All rights reserved.</p>
-            <p className="flex items-center gap-2">
-              Crafted with <Heart size={13} className="text-deep-wine fill-deep-wine animate-pulse" /> on{' '}
-              <Link
-                href="/"
-                className="text-saffron hover:underline font-medium"
-              >
-                AmarBiye
-              </Link>
-            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-5">
+              <p className="flex items-center gap-2">
+                Made with <Heart size={13} className="text-deep-wine fill-deep-wine" /> on{' '}
+                <Link
+                  href="/"
+                  className="text-saffron hover:underline font-medium"
+                >
+                  ShubhoBiye
+                </Link>
+              </p>
+              <DeveloperCredit tone="dark" />
+            </div>
           </motion.div>
 
         </motion.div>

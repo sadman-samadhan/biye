@@ -1,6 +1,5 @@
 'use client'
 
-import { getAllDuas, getParentBlessings } from '@/lib/getData'
 
 function DuaCard({ dua }) {
   if (!dua) return null
@@ -59,9 +58,9 @@ export default function DuasSection({ duasData: propData }) {
   // Support either full duasData object or array of duas
   const rawDuas = Array.isArray(propData) 
     ? propData 
-    : (propData?.duas || getAllDuas())
+    : (propData?.duas || [])
     
-  const parentBlessings = propData?.parentBlessings || getParentBlessings()
+  const parentBlessings = propData?.parentBlessings || {}
 
   if (!rawDuas?.length && !parentBlessings?.message?.en) {
     return null

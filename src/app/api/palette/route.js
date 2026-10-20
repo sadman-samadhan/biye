@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { requireAdmin } from '@/lib/server/admin-session'
+import { requireAdmin } from '@/lib/server/auth'
 import { PRESET_PALETTES, normalizePalette } from '@/lib/palettes'
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
