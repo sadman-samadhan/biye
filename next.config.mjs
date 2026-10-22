@@ -43,6 +43,10 @@ const nextConfig = {
       { source: '/admin/login', destination: '/login', permanent: true },
       // Wedding sites moved from /s/{slug} to /{slug}
       { source: '/s/:path*', destination: '/:path*', permanent: true },
+      // The old built-in demo sites became theme demos
+      { source: '/demo', destination: '/themes', permanent: true },
+      { source: '/rafa-shawon', destination: '/demo/cinematic/muslim', permanent: true },
+      { source: '/demo-hindu', destination: '/demo/laal-paar/hindu', permanent: true },
     ]
   },
   async headers() {

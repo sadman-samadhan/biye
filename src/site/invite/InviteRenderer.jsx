@@ -27,7 +27,7 @@ import { isAnchorCeremony } from '@/traditions'
  * Same theme as the full site; wording comes from the tradition and the
  * couple's invitation settings.
  */
-export default function InviteRenderer({ site, content, theme, tradition, paletteId, viewerName, banner, mode = 'invite', origin = '', qr = null, now = new Date() }) {
+export default function InviteRenderer({ site, content, theme, tradition, paletteId, viewerName, banner, mode = 'invite', origin = '', qr = null, now = new Date(), demo = false }) {
   const copy = resolveCopy(tradition, content.content?.copy || {})
   const c = content.content || {}
   const hero = c.hero || {}
@@ -49,7 +49,7 @@ export default function InviteRenderer({ site, content, theme, tradition, palett
     venue: cer.venue,
     banner: photo(cer.heroImage, cer.heroImagePosition),
     liveStreamUrl: has(cer.liveStreamUrl) ? cer.liveStreamUrl : null,
-    icsUrl: cer.startsAt ? `/${site.slug}/calendar.ics?event=${encodeURIComponent(cer.id)}` : null,
+    icsUrl: cer.startsAt && !demo ? `/${site.slug}/calendar.ics?event=${encodeURIComponent(cer.id)}` : null,
     googleUrl: googleCalendarUrl({
       title: [cer.title?.en, nameLine].filter(Boolean).join(' · '),
       startsAt: cer.startsAt,
@@ -127,12 +127,13 @@ export default function InviteRenderer({ site, content, theme, tradition, palett
               events={rsvp.events.map((e) => ({ id: e.id, title: e.title }))}
               settings={{ maxParty: rsvp.settings.maxParty, collectPhone: rsvp.settings.collectPhone, note: rsvp.settings.note }}
               deadline={deadline}
+              demo={demo}
               copy={copy}
             />
           )}
           <Gallery variant={v.gallery} items={photos} albums={[]} copy={{ ...copy, 'gallery.title': copy['invite.photos.title'] }} viewerName={viewerName} mask={theme.shape.photoMask} />
           {live && on('messages') && <Guestbook slug={site.slug} copy={copy} />}
-          <Share url={url} text={shareText({ names, date, url })} icsUrl={events.some((e) => e.startsAt) ? `/${site.slug}/calendar.ics` : null} qr={qr} copy={copy} />
+          <Share url={url} text={shareText({ names, date, url })} icsUrl={events.some((e) => e.startsAt) && !demo ? `/${site.slug}/calendar.ics` : null} qr={qr} copy={copy} />
           <Closing
             closing={invitation.closing?.en || invitation.closing?.bn ? invitation.closing : copy['invite.closing']}
             signedBy={invitation.signedBy}

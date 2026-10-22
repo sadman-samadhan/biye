@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { isSupabaseConfigured } from '@/lib/server/supabase'
 import { getSiteContent } from '@/lib/server/site-data'
 import { getSiteForRequest } from '@/lib/server/site-view'
-import { isDemoSiteId } from '@/lib/demo'
 import { assertSameOrigin } from '@/lib/server/auth'
 import { clientKey, rateLimitHit } from '@/lib/server/rate-limit'
 import { getOwnRsvp, saveRsvp, toGuestRsvp } from '@/lib/server/rsvp'
@@ -26,8 +25,7 @@ export async function GET(req, { params }) {
   const { slug } = await params
   const { found, state, error } = await load(slug)
   if (error) return error
-  const demo = isDemoSiteId(found.site.id) || !isSupabaseConfigured()
-  const own = demo ? null : await getOwnRsvp(found.site.id)
+  const own = isSupabaseConfigured() ? await getOwnRsvp(found.site.id) : null
   return NextResponse.json({ open: state.open, rsvp: toGuestRsvp(own) }, { headers: NO_STORE })
 }
 
@@ -69,7 +67,7 @@ export async function POST(req, { params }) {
     return NextResponse.json({ error: 'Too many replies. Please wait a few minutes.' }, { status: 429 })
   }
 
-  if (isDemoSiteId(site.id) || !isSupabaseConfigured()) return NextResponse.json({ success: true, demo: true })
+  if (!isSupabaseConfigured()) return NextResponse.json({ error: 'Database is not configured' }, { status: 503 })
 
   try {
     const row = await saveRsvp(site.id, { ...input, events })

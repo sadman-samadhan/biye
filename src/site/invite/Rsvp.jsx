@@ -26,7 +26,7 @@ function Label({ htmlFor, text, children }) {
 const EMPTY = { name: '', phone: '', side: '', attending: null, partySize: 1, events: [], note: '', website: '' }
 
 /** Reply card. Remembers this phone's reply (signed cookie) so guests can change it until replies close. */
-export default function Rsvp({ slug, open, events = [], settings, deadline, copy }) {
+export default function Rsvp({ slug, open, events = [], settings, deadline, copy, demo = false }) {
   const id = useId()
   const [form, setForm] = useState({ ...EMPTY, events: events.map((e) => e.id) })
   const [saved, setSaved] = useState(null)
@@ -35,6 +35,7 @@ export default function Rsvp({ slug, open, events = [], settings, deadline, copy
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    if (demo) return
     let cancelled = false
     fetch(`/api/g/${encodeURIComponent(slug)}/rsvp`, { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
@@ -48,7 +49,7 @@ export default function Rsvp({ slug, open, events = [], settings, deadline, copy
     return () => {
       cancelled = true
     }
-  }, [slug])
+  }, [slug, demo])
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }))
   const toggleEvent = (eventId) => set({ events: form.events.includes(eventId) ? form.events.filter((e) => e !== eventId) : [...form.events, eventId] })
@@ -58,6 +59,13 @@ export default function Rsvp({ slug, open, events = [], settings, deadline, copy
     if (form.attending == null) return setError('Please choose whether you can come.')
     setBusy(true)
     setError(null)
+    // Demo pages show the flow without sending anything
+    if (demo) {
+      setSaved({ ...form, partySize: Number(form.partySize) })
+      setEditing(false)
+      setBusy(false)
+      return
+    }
     try {
       const res = await fetch(`/api/g/${encodeURIComponent(slug)}/rsvp`, {
         method: 'POST',

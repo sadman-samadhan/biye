@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { isSupabaseConfigured, serviceClient } from '@/lib/server/supabase'
 import { getSiteAccess } from '@/lib/server/site-data'
 import { getSiteForRequest } from '@/lib/server/site-view'
-import { isDemoSiteId } from '@/lib/demo'
 import { assertSameOrigin } from '@/lib/server/auth'
 import { clientKey, rateLimitHit } from '@/lib/server/rate-limit'
 
@@ -20,7 +19,7 @@ export async function GET(req, { params }) {
   if (!found) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   if (!found.canView(found.scope)) return NextResponse.json({ error: 'Passcode required' }, { status: 401 })
   const { site } = found
-  if (isDemoSiteId(site.id) || !isSupabaseConfigured()) return NextResponse.json({ messages: [] })
+  if (!isSupabaseConfigured()) return NextResponse.json({ messages: [] })
 
   const { data } = await serviceClient()
     .from('messages')
@@ -61,8 +60,8 @@ export async function POST(req, { params }) {
     return NextResponse.json({ error: 'Too many messages. Please wait a few minutes.' }, { status: 429 })
   }
 
-  if (isDemoSiteId(site.id) || !isSupabaseConfigured()) {
-    return NextResponse.json({ success: true, demo: true })
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json({ error: 'Database is not configured' }, { status: 503 })
   }
 
   const access = await getSiteAccess(site.id)
