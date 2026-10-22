@@ -70,7 +70,7 @@ if (existing) {
 
 const { site } = await call('/api/admin/sites', {
   method: 'POST',
-  body: { slug: SLUG, status: 'live', wedding_type: TRADITION, products: ['invite', 'site'], owner_name: 'Ayesha & Rafiq', content: { hero: { coupleNames: { en: 'Ayesha & Rafiq', bn: 'আয়েশা ও রফিক' } } } },
+  body: { slug: SLUG, consent: true, status: 'live', wedding_type: TRADITION, products: ['invite', 'site'], owner_name: 'Ayesha & Rafiq', content: { hero: { coupleNames: { en: 'Ayesha & Rafiq', bn: 'আয়েশা ও রফিক' } } } },
 })
 console.log('site', site.id)
 

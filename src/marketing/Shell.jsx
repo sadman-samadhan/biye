@@ -60,6 +60,12 @@ export default function Shell({ locale = 'en', children }) {
             <Link href="/login" className="hover:text-sb-ink">
               {t.footer.login}
             </Link>
+            <Link href="/privacy" className="hover:text-sb-ink">
+              {t.footer.privacy}
+            </Link>
+            <Link href="/terms" className="hover:text-sb-ink">
+              {t.footer.terms}
+            </Link>
             <DeveloperCredit />
           </div>
         </div>

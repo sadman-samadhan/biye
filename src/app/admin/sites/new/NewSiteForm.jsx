@@ -18,6 +18,7 @@ function Form() {
   const [products, setProducts] = useState({ invite: true, site: true })
   const [owner, setOwner] = useState({ name: '', email: '', phone: '' })
   const [creating, setCreating] = useState(false)
+  const [consent, setConsent] = useState(false)
 
   const effectiveSlug = slugTouched ? slug : slugify(names.en)
   const slugError = effectiveSlug ? slugProblem(effectiveSlug) : null
@@ -33,6 +34,7 @@ function Form() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           slug: effectiveSlug,
+          consent,
           status: 'draft',
           wedding_type: weddingType,
           products: [products.invite && 'invite', products.site && 'site'].filter(Boolean),
@@ -102,8 +104,22 @@ function Form() {
           </div>
         </CardBody>
       </Card>
+      <label className="flex items-start gap-3 rounded-xl border border-sb-line bg-sb-card p-4 text-sm text-sb-ink-soft">
+        <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#D4741C]" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+        <span>
+          The couple has accepted the{' '}
+          <a href="/terms" target="_blank" className="underline">
+            terms
+          </a>{' '}
+          and{' '}
+          <a href="/privacy" target="_blank" className="underline">
+            privacy notice
+          </a>
+          , and confirmed they have permission to share the photos they will upload.
+        </span>
+      </label>
       <div className="flex justify-end">
-        <Button type="submit" variant="primary" size="lg" icon={ArrowRight} loading={creating} disabled={!effectiveSlug || Boolean(slugError) || !(products.invite || products.site)}>
+        <Button type="submit" variant="primary" size="lg" icon={ArrowRight} loading={creating} disabled={!consent || !effectiveSlug || Boolean(slugError) || !(products.invite || products.site)}>
           Create draft site
         </Button>
       </div>

@@ -82,7 +82,7 @@ export const MARKETING = {
         { q: 'How do we pay?', a: 'Message us on WhatsApp. We take bKash, Nagad and bank transfer.' },
       ],
     },
-    footer: { tagline: 'Wedding websites for Bangladeshi families.', themes: 'Themes', credits: 'Demo photo credits', login: 'Couple login' },
+    footer: { tagline: 'Wedding websites for Bangladeshi families.', themes: 'Themes', credits: 'Demo photo credits', login: 'Couple login', privacy: 'Privacy', terms: 'Terms' },
   },
 
   bn: {
@@ -159,7 +159,7 @@ export const MARKETING = {
         { q: 'টাকা কীভাবে দেব?', a: 'হোয়াটসঅ্যাপে মেসেজ দিন। বিকাশ, নগদ আর ব্যাংক ট্রান্সফার নেওয়া হয়।' },
       ],
     },
-    footer: { tagline: 'বাংলাদেশি পরিবারের জন্য বিয়ের ওয়েবসাইট।', themes: 'থিম', credits: 'ডেমো ছবির কৃতজ্ঞতা', login: 'লগইন' },
+    footer: { tagline: 'বাংলাদেশি পরিবারের জন্য বিয়ের ওয়েবসাইট।', themes: 'থিম', credits: 'ডেমো ছবির কৃতজ্ঞতা', login: 'লগইন', privacy: 'গোপনীয়তা', terms: 'শর্তাবলি' },
   },
 }
 

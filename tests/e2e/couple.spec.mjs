@@ -8,7 +8,7 @@ test('a couple accepts the invite, edits their own site and downloads their phot
 
   const make = async (s) => {
     const res = await page.request.post('/api/admin/sites', {
-      data: { slug: s, status: 'live', wedding_type: 'universal', products: ['invite', 'site'], content: { hero: { coupleNames: { en: 'Mira & Sami', bn: 'মীরা ও সামি' } } } },
+      data: { slug: s, consent: true, status: 'live', wedding_type: 'universal', products: ['invite', 'site'], content: { hero: { coupleNames: { en: 'Mira & Sami', bn: 'মীরা ও সামি' } } } },
     })
     expect(res.ok()).toBeTruthy()
     return (await res.json()).site

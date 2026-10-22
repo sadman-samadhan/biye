@@ -11,6 +11,8 @@ test('operator creates a site, edits every core section and publishes it', async
   await page.getByRole('textbox', { name: 'Couple names (বাংলা)' }).fill('নাদিয়া ও তানভীর')
   const slug = await page.getByLabel('Address').inputValue()
   expect(slug).toBe(`nadia-and-tanvir-${stamp}`)
+  await expect(page.getByRole('button', { name: 'Create draft site' })).toBeDisabled()
+  await page.getByRole('checkbox', { name: /accepted the terms/ }).check()
   await page.getByRole('button', { name: 'Create draft site' }).click()
   await page.waitForURL(/\/admin\/sites\/[0-9a-f-]{36}/)
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Nadia & Tanvir')

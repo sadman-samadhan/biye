@@ -30,6 +30,10 @@ export async function POST(req) {
 
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+  // The couple must have accepted the terms and confirmed they may share their photos
+  if (body.consent !== true) {
+    return NextResponse.json({ error: 'Confirm that the couple accepted the terms and may share their photos.', field: 'consent' }, { status: 400 })
+  }
 
   const slug = slugify(body.slug)
   const problem = slugProblem(slug)
@@ -98,6 +102,6 @@ export async function POST(req) {
   }
 
   const user = await getCurrentUser()
-  await writeAudit({ actorKind: 'admin', actorId: user?.id, siteId: site.id, action: 'site.create', meta: { slug } })
+  await writeAudit({ actorKind: 'admin', actorId: user?.id, siteId: site.id, action: 'site.create', meta: { slug, consent: true, consentAt: new Date().toISOString() } })
   return NextResponse.json({ success: true, site })
 }

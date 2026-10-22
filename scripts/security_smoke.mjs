@@ -120,7 +120,7 @@ async function appProbes() {
   ]
   for (const [label, headers] of forged) {
     await probe(`GET /api/admin/sites (${label})`, `${BASE}/api/admin/sites`, { headers })
-    await probe(`POST /api/admin/sites (${label})`, `${BASE}/api/admin/sites`, { method: 'POST', headers: { ...headers, ...json }, body: '{"slug":"smoke-created"}' })
+    await probe(`POST /api/admin/sites (${label})`, `${BASE}/api/admin/sites`, { method: 'POST', headers: { ...headers, ...json }, body: '{"slug":"smoke-created","consent":true}' })
     await probe(`DELETE /api/admin/sites/x (${label})`, `${BASE}/api/admin/sites/x?permanent=true`, { method: 'DELETE', headers })
     await probe(`PATCH /api/sites/x/messages/y (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/messages/00000000-0000-0000-0000-000000000000`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"approved":true}' })
     await probe(`POST /api/sites/x/uploads (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/uploads`, { method: 'POST', headers: { ...headers, ...json }, body: '{"kind":"image","contentType":"image/jpeg","bytes":1000}' })
@@ -140,6 +140,8 @@ async function appProbes() {
     await probe(`POST /api/sites/x/media/download-links (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/media/download-links`, { method: 'POST', headers: { ...headers, ...json }, body: '{}' })
     await probe(`POST /api/sites/x/palette (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/palette`, { method: 'POST', headers: { ...headers, ...json }, body: '{"media":"media:00000000-0000-0000-0000-000000000000"}' })
   }
+  await probe('GET /api/cron/daily without the secret', `${BASE}/api/cron/daily`)
+  await probe('GET /api/cron/daily with a wrong secret', `${BASE}/api/cron/daily`, { headers: { Authorization: 'Bearer not-the-secret-0000' } })
   await probe('GET /admin redirects to login', `${BASE}/admin`)
   await probe('GET /dashboard redirects to login', `${BASE}/dashboard`)
   await probe('GET /dashboard/x redirects to login', `${BASE}/dashboard/00000000-0000-0000-0000-000000000000`)

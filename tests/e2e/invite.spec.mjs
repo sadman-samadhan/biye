@@ -12,6 +12,7 @@ test('couple sets up the invitation, a guest replies and changes the reply', asy
   const created = await page.request.post('/api/admin/sites', {
     data: {
       slug,
+      consent: true,
       status: 'live',
       wedding_type: 'hindu',
       products: ['invite', 'site'],

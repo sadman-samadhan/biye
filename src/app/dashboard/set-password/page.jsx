@@ -10,6 +10,17 @@ export default async function SetPasswordPage() {
         You’ll use <strong className="font-medium text-[#1E1A17]">{user.email}</strong> and this password to sign in.
       </p>
       <SetPasswordForm />
+      <p className="mt-6 text-xs text-[#6B625A]">
+        By continuing you agree to the{' '}
+        <a href="/terms" className="underline">
+          terms
+        </a>{' '}
+        and{' '}
+        <a href="/privacy" className="underline">
+          privacy notice
+        </a>
+        .
+      </p>
     </div>
   )
 }
