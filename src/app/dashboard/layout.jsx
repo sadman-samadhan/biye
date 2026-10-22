@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children }) {
   return (
     <div className="min-h-screen bg-[#FBF6EE] text-[#1E1A17] flex flex-col">
       <header className="border-b border-[#E8DFD2] bg-[#FBF6EE]/90 backdrop-blur sticky top-0 z-20">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
           <Link href="/dashboard" aria-label="Your sites">
             <BrandLogo height={34} />
           </Link>
@@ -33,7 +33,7 @@ export default async function DashboardLayout({ children }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6">{children}</main>
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">{children}</main>
       <footer className="border-t border-[#E8DFD2] py-6 text-center text-xs text-[#6B625A]">
         <DeveloperCredit />
       </footer>

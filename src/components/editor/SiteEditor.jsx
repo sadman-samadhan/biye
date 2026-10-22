@@ -20,6 +20,7 @@ import MessagesPanel from './panels/MessagesPanel'
 import AccessPanel from './panels/AccessPanel'
 import InvitationPanel from './panels/InvitationPanel'
 import RsvpsPanel from './panels/RsvpsPanel'
+import PhotosPanel from './panels/PhotosPanel'
 import AdminSettingsPanel from './panels/AdminSettingsPanel'
 import MembersPanel from './panels/MembersPanel'
 
@@ -34,6 +35,7 @@ const PANELS = [
   { key: 'ceremonies', group: 'Content', label: 'Ceremonies', Component: CeremoniesPanel },
   { key: 'gallery', group: 'Content', label: 'Gallery', Component: GalleryPanel },
   { key: 'blessings', group: 'Content', label: 'Blessings', Component: BlessingsPanel },
+  { key: 'photos', group: 'Content', label: 'Your photos', Component: PhotosPanel },
   { key: 'footer', group: 'Content', label: 'Closing & contact', Component: FooterPanel },
   { key: 'access', group: 'Guests', label: 'Privacy & sharing', Component: AccessPanel },
   { key: 'rsvps', group: 'Guests', label: 'RSVPs', Component: RsvpsPanel },

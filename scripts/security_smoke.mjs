@@ -137,10 +137,12 @@ async function appProbes() {
     await probe(`POST /api/sites/x/access/revoke (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/access/revoke`, { method: 'POST', headers: { ...headers, ...json }, body: '{}' })
     await probe(`GET /api/sites/x/rsvps (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/rsvps?format=csv`, { headers })
     await probe(`DELETE /api/sites/x/rsvps/y (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/rsvps/00000000-0000-0000-0000-000000000000`, { method: 'DELETE', headers })
+    await probe(`POST /api/sites/x/media/download-links (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/media/download-links`, { method: 'POST', headers: { ...headers, ...json }, body: '{}' })
     await probe(`POST /api/sites/x/palette (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/palette`, { method: 'POST', headers: { ...headers, ...json }, body: '{"media":"media:00000000-0000-0000-0000-000000000000"}' })
   }
   await probe('GET /admin redirects to login', `${BASE}/admin`)
   await probe('GET /dashboard redirects to login', `${BASE}/dashboard`)
+  await probe('GET /dashboard/x redirects to login', `${BASE}/dashboard/00000000-0000-0000-0000-000000000000`)
 }
 
 await supabaseProbes()

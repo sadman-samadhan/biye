@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { requireUserPage } from '@/lib/server/auth'
 import { isSupabaseConfigured, serviceClient } from '@/lib/server/supabase'
 
@@ -21,6 +22,8 @@ async function getMySites(userId) {
 export default async function DashboardHome() {
   const user = await requireUserPage('/dashboard')
   const sites = await getMySites(user.id)
+  // Most couples have one site: go straight to it
+  if (sites.length === 1 && !user.isAdmin) redirect(`/dashboard/${sites[0].id}`)
 
   return (
     <div className="space-y-8">
@@ -53,6 +56,9 @@ export default async function DashboardHome() {
                   <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${status.className}`}>{status.text}</span>
                 </div>
                 <div className="mt-5 flex flex-wrap gap-2 text-sm">
+                  <Link href={`/dashboard/${site.id}`} className="rounded-lg bg-[#1E1A17] px-3 py-1.5 text-white hover:bg-[#3A332D]">
+                    Edit
+                  </Link>
                   <Link href={`/${site.slug}`} className="rounded-lg border border-[#E2D8C9] px-3 py-1.5 hover:bg-[#FBF6EE]">
                     View site
                   </Link>

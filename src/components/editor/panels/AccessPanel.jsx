@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import QRCode from 'qrcode'
 import { Copy, Download, KeyRound, LogOut, RefreshCw, Share2 } from 'lucide-react'
-import { Button, Card, CardBody, CardHeader, EmptyState, Select, TextInput, useConfirm, useToast } from '@/ui'
+import { Button, Card, CardBody, CardHeader, EmptyState, Select, Switch, TextInput, useConfirm, useToast } from '@/ui'
 
 function useCopy() {
   const toast = useToast()
@@ -35,7 +35,7 @@ function Row({ label, value, onCopy, mono = false }) {
 }
 
 /** Guest privacy: passcode, who can see what, share links, watermark, moderation. */
-export default function AccessPanel({ data }) {
+export default function AccessPanel({ data, saveSettings }) {
   const toast = useToast()
   const confirm = useConfirm()
   const copy = useCopy()
@@ -46,6 +46,18 @@ export default function AccessPanel({ data }) {
   const [custom, setCustom] = useState('')
   const [busy, setBusy] = useState(null)
   const [rebuild, setRebuild] = useState(null)
+  const [published, setPublished] = useState(Boolean(data.site.memories_published))
+
+  async function setMemoriesPublished(on) {
+    setPublished(on)
+    try {
+      await saveSettings({ memories_published: on })
+      toast.success(on ? 'Full site published' : 'Full site hidden')
+    } catch (err) {
+      setPublished(!on)
+      toast.error(err.message)
+    }
+  }
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/sites/${siteId}/access`, { cache: 'no-store' })
@@ -181,6 +193,14 @@ export default function AccessPanel({ data }) {
                 { value: 'public', label: 'Anyone with the link — only photos you mark as public are shown' },
                 { value: 'passcode', label: 'Only guests with the passcode' },
               ]}
+            />
+          )}
+          {products.includes('site') && products.includes('invite') && (
+            <Switch
+              label="Show the full site after the wedding"
+              description="Once your photos are ready, your link switches from the invitation to the full site with the gallery (the day after the last event)."
+              checked={published}
+              onChange={setMemoriesPublished}
             />
           )}
           {products.includes('site') && (
