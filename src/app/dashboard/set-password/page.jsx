@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { requireUserPage } from '@/lib/server/auth'
 import SetPasswordForm from './SetPasswordForm'
 
@@ -12,13 +13,13 @@ export default async function SetPasswordPage() {
       <SetPasswordForm />
       <p className="mt-6 text-xs text-[#6B625A]">
         By continuing you agree to the{' '}
-        <a href="/terms" className="underline">
+        <Link href="/terms" className="underline">
           terms
-        </a>{' '}
+        </Link>{' '}
         and{' '}
-        <a href="/privacy" className="underline">
+        <Link href="/privacy" className="underline">
           privacy notice
-        </a>
+        </Link>
         .
       </p>
     </div>
