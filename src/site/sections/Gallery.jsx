@@ -5,8 +5,49 @@ import Photo from '../primitives/Photo'
 import Lightbox from '../primitives/Lightbox'
 import { Bilingual } from '../primitives/text'
 import { ArchOutline } from '@/themes/ornaments'
+import { THEME_VARIANTS } from '@/themes/variants'
 
 const PAGE = 24
+
+function ArchGrid({ items, onOpen, mask }) {
+  return (
+    <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6">
+      {items.map((item, i) => (
+        <li key={item.id || item.src}>
+          <button type="button" onClick={() => onOpen(i)} className="group relative block aspect-[3/4] w-full text-t-ornament" aria-label={`Open photo ${i + 1}`}>
+            <Photo src={item.src} thumb={item.thumb} alt={item.alt || ''} lqip={item.lqip} mask={mask} sizes="(min-width: 640px) 33vw, 50vw" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]" />
+            {mask === 'arch' && <ArchOutline className="opacity-70" />}
+          </button>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function Masonry({ items, onOpen }) {
+  return (
+    <ul className="columns-2 gap-3 md:columns-3 md:gap-5">
+      {items.map((item, i) => (
+        <li key={item.id || item.src} className="mb-3 break-inside-avoid md:mb-5">
+          <button type="button" onClick={() => onOpen(i)} className="group block w-full overflow-hidden rounded-[var(--t-radius)] bg-t-bg-alt" aria-label={`Open photo ${i + 1}`}>
+            <Photo
+              src={item.src}
+              thumb={item.thumb}
+              alt={item.alt || ''}
+              lqip={item.lqip}
+              width={item.width}
+              height={item.height}
+              sizes="(min-width: 768px) 33vw, 50vw"
+              className="h-auto w-full transition duration-700 group-hover:scale-[1.03]"
+            />
+          </button>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+const LAYOUTS = { masonry: Masonry, 'arch-grid': ArchGrid, ...THEME_VARIANTS.gallery }
 
 export default function Gallery({ variant, items = [], albums = [], copy, viewerName, mask }) {
   const [album, setAlbum] = useState('all')
@@ -18,7 +59,7 @@ export default function Gallery({ variant, items = [], albums = [], copy, viewer
   const shown = filtered.slice(0, visible)
   if (!items.length) return null
 
-  const archGrid = variant === 'arch-grid'
+  const Layout = LAYOUTS[variant] || Masonry
 
   return (
     <section id="gallery" className="bg-t-bg py-24 md:py-32">
@@ -52,37 +93,7 @@ export default function Gallery({ variant, items = [], albums = [], copy, viewer
           </div>
         )}
 
-        {archGrid ? (
-          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6">
-            {shown.map((item, i) => (
-              <li key={item.id || item.src}>
-                <button type="button" onClick={() => setOpen(i)} className="group relative block aspect-[3/4] w-full text-t-ornament" aria-label={`Open photo ${i + 1}`}>
-                  <Photo src={item.src} thumb={item.thumb} alt={item.alt || ''} lqip={item.lqip} mask={mask} sizes="(min-width: 640px) 33vw, 50vw" className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]" />
-                  {mask === 'arch' && <ArchOutline className="opacity-70" />}
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <ul className="columns-2 gap-3 md:columns-3 md:gap-5">
-            {shown.map((item, i) => (
-              <li key={item.id || item.src} className="mb-3 break-inside-avoid md:mb-5">
-                <button type="button" onClick={() => setOpen(i)} className="group block w-full overflow-hidden rounded-[var(--t-radius)] bg-t-bg-alt" aria-label={`Open photo ${i + 1}`}>
-                  <Photo
-                    src={item.src}
-                    thumb={item.thumb}
-                    alt={item.alt || ''}
-                    lqip={item.lqip}
-                    width={item.width}
-                    height={item.height}
-                    sizes="(min-width: 768px) 33vw, 50vw"
-                    className="h-auto w-full transition duration-700 group-hover:scale-[1.03]"
-                  />
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+        <Layout items={shown} onOpen={setOpen} mask={mask} />
 
         {filtered.length > visible && (
           <div className="mt-12 text-center">

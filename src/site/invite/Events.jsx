@@ -2,7 +2,7 @@ import { CalendarPlus, MapPin, Radio } from 'lucide-react'
 import Reveal from '../primitives/Reveal'
 import Photo from '../primitives/Photo'
 import { Bilingual } from '../primitives/text'
-import { ArchOutline } from '@/themes/ornaments'
+import { MaskOutline } from '@/themes/ornaments'
 import { TIME_ZONE } from '@/lib/phase'
 
 const has = (v) => typeof v === 'string' && v.trim()
@@ -91,19 +91,19 @@ function Timeline({ events, copy }) {
   )
 }
 
-/** Arched cards with the event's photo (Jharokha). */
-function Arches({ events, copy }) {
+/** Cards with the event's photo in the theme's shape (arch, betel leaf, quilt patch). */
+function Cards({ events, copy, mask }) {
   return (
     <ul className="grid gap-12 sm:grid-cols-2">
       {events.map((event, i) => (
         <Reveal as="li" key={event.id} delay={i * 0.05} className="text-center">
           <div className="relative mx-auto aspect-[4/5] w-full max-w-[18rem] text-t-ornament">
             {event.banner ? (
-              <Photo src={event.banner.src} position={event.banner.position} alt="" mask="arch" sizes="18rem" className="absolute inset-0 h-full w-full object-cover" />
+              <Photo src={event.banner.src} position={event.banner.position} alt="" mask={mask} sizes="18rem" className="absolute inset-0 h-full w-full object-cover" />
             ) : (
-              <div className="absolute inset-0 bg-t-bg-alt" style={{ clipPath: 'url(#shb-arch)' }} />
+              <div className="absolute inset-0 bg-t-bg-alt" style={{ clipPath: `url(#shb-${mask})` }} />
             )}
-            <ArchOutline />
+            <MaskOutline mask={mask} dashed={mask === 'patch'} />
           </div>
           <Bilingual value={event.title} as="h3" className="mt-6" enClassName="t-display text-2xl" bnClassName="mt-0.5 font-t-bn-display text-lg text-t-ink-muted" />
           <Bilingual value={event.when} className="mt-3" enClassName="text-base" bnClassName="text-sm text-t-ink-muted" />
@@ -115,6 +115,9 @@ function Arches({ events, copy }) {
   )
 }
 
+// Invite variants that show events as photo cards, and the shape they use
+const CARD_MASKS = { arch: 'arch', paar: 'leaf', patch: 'patch' }
+
 export default function Events({ variant, events = [], copy }) {
   if (!events.length) return null
   return (
@@ -123,7 +126,7 @@ export default function Events({ variant, events = [], copy }) {
         <Reveal as="header" className="mb-14 text-center">
           <Bilingual value={copy['invite.events.title']} as="h2" enClassName="t-display text-4xl md:text-6xl" bnClassName="mt-2 font-t-bn-display text-2xl text-t-ink-muted" />
         </Reveal>
-        {variant === 'arch' ? <Arches events={events} copy={copy} /> : <Timeline events={events} copy={copy} />}
+        {CARD_MASKS[variant] ? <Cards events={events} copy={copy} mask={CARD_MASKS[variant]} /> : <Timeline events={events} copy={copy} />}
       </div>
     </section>
   )

@@ -252,6 +252,40 @@ body {
 [data-theme] :lang(bn) {
   line-height: 1.75;
 }
+
+/* Theme ornaments: SVG paths with pathLength="1" trace themselves in; spin turns slowly */
+.shb-draw :is(path, circle)[pathLength] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: shb-draw 2.6s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+.shb-draw g > g:nth-child(3) :is(path, circle) { animation-delay: 0.35s; }
+.shb-draw g > g:nth-child(4) :is(path, circle) { animation-delay: 0.7s; }
+@keyframes shb-draw {
+  to { stroke-dashoffset: 0; }
+}
+.shb-spin {
+  animation: shb-spin 180s linear infinite;
+}
+@keyframes shb-spin {
+  to { transform: rotate(360deg); }
+}
+.shb-glow {
+  animation: shb-glow 6s ease-in-out infinite alternate;
+}
+@keyframes shb-glow {
+  from { opacity: 0.55; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1.03); }
+}
+/* Editorial drop cap (Patrika) */
+[data-theme] .t-dropcap:not(:lang(bn))::first-letter {
+  float: left;
+  font-family: var(--t-font-display);
+  font-size: 4.6em;
+  line-height: 0.82;
+  padding: 0.06em 0.12em 0 0;
+  color: var(--t-accent);
+}
 /* Display headings: per-theme case and tracking (Latin only; Bangla keeps its own rules) */
 [data-theme] .t-display {
   font-family: var(--t-font-display);

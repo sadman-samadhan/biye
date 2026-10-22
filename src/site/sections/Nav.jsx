@@ -24,6 +24,8 @@ export default function Nav({ initials = [], items = [], overDarkHero = false })
 
   const transparent = overDarkHero && !scrolled && !open
   const monogram = initials.filter(Boolean).join(' & ')
+  // Long menus (e.g. a Bengali Hindu wedding's many events) only fit inline on wide screens
+  const crowded = items.reduce((n, item) => n + (item.label?.en || '').length, 0) > 80
 
   return (
     <header
@@ -32,10 +34,10 @@ export default function Nav({ initials = [], items = [], overDarkHero = false })
       }`}
     >
       <nav aria-label="Sections" className="mx-auto flex h-16 max-w-7xl items-center justify-between px-[max(1.25rem,env(safe-area-inset-left))]">
-        <a href="#home" className="t-display text-xl tracking-wide">
+        <a href="#home" className="t-display shrink-0 whitespace-nowrap text-xl tracking-wide">
           {monogram}
         </a>
-        <ul className="hidden items-center gap-7 text-[13px] uppercase tracking-[0.18em] lg:flex">
+        <ul className={`hidden items-center gap-6 whitespace-nowrap text-[13px] uppercase tracking-[0.16em] ${crowded ? '2xl:flex' : 'lg:flex'}`}>
           {items.map((item) => (
             <li key={item.id}>
               <a href={`#${item.id}`} className="opacity-80 transition hover:opacity-100">
@@ -44,12 +46,12 @@ export default function Nav({ initials = [], items = [], overDarkHero = false })
             </li>
           ))}
         </ul>
-        <button type="button" className="rounded-md p-2 lg:hidden" aria-expanded={open} aria-controls="site-menu" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen((o) => !o)}>
+        <button type="button" className={`rounded-md p-2 ${crowded ? '2xl:hidden' : 'lg:hidden'}`} aria-expanded={open} aria-controls="site-menu" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen((o) => !o)}>
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
       </nav>
       {open && (
-        <ul id="site-menu" className="border-t border-t-line/60 bg-t-bg px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 lg:hidden">
+        <ul id="site-menu" className={`max-h-[80svh] overflow-y-auto border-t border-t-line/60 bg-t-bg px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 ${crowded ? '2xl:hidden' : 'lg:hidden'}`}>
           {items.map((item) => (
             <li key={item.id}>
               <a href={`#${item.id}`} onClick={() => setOpen(false)} className="flex items-baseline justify-between border-b border-t-line/50 py-4">

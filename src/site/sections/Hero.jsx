@@ -5,6 +5,7 @@ import { motion, useReducedMotion, useScroll, useSpring, useTransform } from 'fr
 import Photo from '../primitives/Photo'
 import { SacredText, splitNames } from '../primitives/text'
 import { ArchOutline, GirihPattern, KhatamStar } from '@/themes/ornaments'
+import { THEME_VARIANTS } from '@/themes/variants'
 
 function Invocation({ invocation, className = '', textClassName = '' }) {
   if (!invocation?.text) return null
@@ -179,6 +180,9 @@ function ArchHero({ names, date, invocation, media }) {
   )
 }
 
+const LAYOUTS = { cinematic: CinematicHero, arch: ArchHero, ...THEME_VARIANTS.hero }
+
 export default function Hero({ variant, ...props }) {
-  return variant === 'arch' ? <ArchHero {...props} /> : <CinematicHero {...props} />
+  const Layout = LAYOUTS[variant] || CinematicHero
+  return <Layout {...props} />
 }

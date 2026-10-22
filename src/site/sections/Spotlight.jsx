@@ -2,6 +2,7 @@ import Reveal from '../primitives/Reveal'
 import Photo from '../primitives/Photo'
 import { Bilingual } from '../primitives/text'
 import { ArchOutline } from '@/themes/ornaments'
+import { THEME_VARIANTS } from '@/themes/variants'
 
 /** Dark full-bleed band with a large photo (Cinematic). */
 function Band({ title, description, image, position, eyebrow }) {
@@ -44,8 +45,10 @@ function ArchSplit({ title, description, image, position, eyebrow }) {
   )
 }
 
+const LAYOUTS = { band: Band, 'arch-split': ArchSplit, ...THEME_VARIANTS.spotlight }
+
 export default function Spotlight({ variant, copy, ...props }) {
   if (!props.title?.en && !props.description?.en && !props.image) return null
-  const shared = { ...props, eyebrow: copy['spotlight.eyebrow'] }
-  return variant === 'arch-split' ? <ArchSplit {...shared} /> : <Band {...shared} />
+  const Layout = LAYOUTS[variant] || Band
+  return <Layout {...props} eyebrow={copy['spotlight.eyebrow']} />
 }

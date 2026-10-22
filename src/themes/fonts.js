@@ -1,11 +1,20 @@
 import {
   Amiri,
+  Atma,
+  Bodoni_Moda,
   Cormorant_Garamond,
   EB_Garamond,
+  Fraunces,
   Galada,
+  Hanken_Grotesk,
   Hind_Siliguri,
   Inter,
+  Italiana,
+  Jost,
+  Kalnia,
+  Karla,
   Marcellus,
+  Spectral,
   Tiro_Bangla,
   Tiro_Devanagari_Sanskrit,
 } from 'next/font/google'
@@ -24,8 +33,17 @@ const tiroBangla = Tiro_Bangla({ weight: '400', style: ['normal', 'italic'], sub
 const galada = Galada({ weight: '400', subsets: ['bengali', 'latin'], variable: '--ff-galada', display: 'swap', preload: false })
 const hindSiliguri = Hind_Siliguri({ weight: ['400', '500', '600'], subsets: ['bengali', 'latin'], variable: '--ff-hindsiliguri', display: 'swap', preload: false })
 const tiroSanskrit = Tiro_Devanagari_Sanskrit({ weight: '400', subsets: ['devanagari', 'latin'], variable: '--ff-tirosanskrit', display: 'swap', preload: false })
+const italiana = Italiana({ weight: '400', subsets: ['latin'], variable: '--ff-italiana', display: 'swap', preload: false })
+const jost = Jost({ subsets: ['latin', 'latin-ext'], variable: '--ff-jost', display: 'swap', preload: false })
+const kalnia = Kalnia({ subsets: ['latin', 'latin-ext'], variable: '--ff-kalnia', display: 'swap', preload: false })
+const spectral = Spectral({ weight: ['300', '400', '500', '600'], style: ['normal', 'italic'], subsets: ['latin', 'latin-ext'], variable: '--ff-spectral', display: 'swap', preload: false })
+const fraunces = Fraunces({ style: ['normal', 'italic'], subsets: ['latin', 'latin-ext'], variable: '--ff-fraunces', display: 'swap', preload: false })
+const karla = Karla({ subsets: ['latin', 'latin-ext'], variable: '--ff-karla', display: 'swap', preload: false })
+const atma = Atma({ weight: ['400', '600'], subsets: ['bengali', 'latin'], variable: '--ff-atma', display: 'swap', preload: false })
+const bodoni = Bodoni_Moda({ style: ['normal', 'italic'], subsets: ['latin', 'latin-ext'], variable: '--ff-bodoni', display: 'swap', preload: false })
+const hanken = Hanken_Grotesk({ subsets: ['latin', 'latin-ext'], variable: '--ff-hanken', display: 'swap', preload: false })
 
-export const themeFontVariables = [cormorant, inter, marcellus, ebGaramond, amiri, tiroBangla, galada, hindSiliguri, tiroSanskrit]
+export const themeFontVariables = [cormorant, inter, marcellus, ebGaramond, amiri, tiroBangla, galada, hindSiliguri, tiroSanskrit, italiana, jost, kalnia, spectral, fraunces, karla, atma, bodoni, hanken]
   .map((font) => font.variable)
   .join(' ')
 
@@ -40,4 +58,13 @@ export const FONT_STACKS = {
   galada: "var(--ff-galada), var(--ff-tirobangla), 'Noto Serif Bengali', serif",
   hindsiliguri: "var(--ff-hindsiliguri), 'Noto Sans Bengali', 'Nirmala UI', sans-serif",
   tirosanskrit: "var(--ff-tirosanskrit), 'Noto Serif Devanagari', 'Mangal', serif",
+  italiana: "var(--ff-italiana), 'Didot', Georgia, serif",
+  jost: "var(--ff-jost), 'Futura', 'Segoe UI', system-ui, sans-serif",
+  kalnia: "var(--ff-kalnia), Georgia, serif",
+  spectral: "var(--ff-spectral), Georgia, serif",
+  fraunces: "var(--ff-fraunces), Georgia, serif",
+  karla: "var(--ff-karla), 'Segoe UI', system-ui, sans-serif",
+  atma: "var(--ff-atma), var(--ff-tirobangla), 'Noto Sans Bengali', sans-serif",
+  bodoni: "var(--ff-bodoni), 'Bodoni 72', Didot, Georgia, serif",
+  hanken: "var(--ff-hanken), 'Helvetica Neue', Arial, sans-serif",
 }

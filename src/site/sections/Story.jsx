@@ -2,6 +2,7 @@ import Reveal from '../primitives/Reveal'
 import Photo from '../primitives/Photo'
 import { Bilingual } from '../primitives/text'
 import { ArchOutline } from '@/themes/ornaments'
+import { THEME_VARIANTS } from '@/themes/variants'
 
 /** Alternating photo/text rows (Cinematic). */
 function Alternating({ title, milestones, copy }) {
@@ -66,11 +67,14 @@ function Medallion({ title, milestones, copy, mask }) {
   )
 }
 
+const LAYOUTS = { alternating: Alternating, medallion: Medallion, ...THEME_VARIANTS.story }
+
 export default function Story({ variant, milestones = [], ...props }) {
   if (!milestones.length) return null
+  const Layout = LAYOUTS[variant] || Alternating
   return (
     <section id="story" className="bg-t-bg py-24 md:py-32">
-      {variant === 'medallion' ? <Medallion milestones={milestones} {...props} /> : <Alternating milestones={milestones} {...props} />}
+      <Layout milestones={milestones} {...props} />
     </section>
   )
 }

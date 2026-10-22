@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { SacredText, splitNames } from '@/site/primitives/text'
 import { GirihPattern, KhatamStar } from '../ornaments'
+import { AlponaBloom, ArchLight, CoverTurn, StitchUnfold } from './more'
 
 /** Letterbox bars part around a title card (Cinematic). */
 function FilmLeader({ names, onDone }) {
@@ -69,7 +70,7 @@ function ArchDoors({ invocation, names, onDone }) {
   )
 }
 
-const OPENINGS = { film: FilmLeader, 'arch-doors': ArchDoors }
+const OPENINGS = { film: FilmLeader, 'arch-doors': ArchDoors, 'arch-light': ArchLight, alpona: AlponaBloom, stitch: StitchUnfold, cover: CoverTurn }
 
 /**
  * Plays the theme's opening once per visit (per tab session). Always skippable,
@@ -116,7 +117,7 @@ export default function OpeningGate({ kind, slug, names, invocation, skipLabel =
       {show && (
         <motion.div key="opening" className="fixed inset-0 z-[90]" exit={{ opacity: 0 }} transition={{ duration: 0.6, delay: 0.5 }}>
           <Opening names={names} invocation={invocation} onDone={done} />
-          <button type="button" onClick={done} className="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-6 z-10 rounded-full border border-current/30 px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-t-on-inverse/80 hover:text-t-on-inverse">
+          <button type="button" onClick={done} className="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-6 z-10 rounded-full bg-t-inverse/70 px-4 py-1.5 text-xs uppercase tracking-[0.25em] text-t-on-inverse backdrop-blur hover:bg-t-inverse">
             {skipLabel}
           </button>
         </motion.div>

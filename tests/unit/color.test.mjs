@@ -44,3 +44,20 @@ test("another theme's preset does not leak into this theme", () => {
   const foreignPreset = { id: 'classic-elegance', bone: '#faf9f6', graphite: '#2b2b2b', accent: '#a67c52', deepAccent: '#6b2c3e', warmAccent: '#d4a574' }
   assert.equal(resolvePalette(theme, { sitePalette: foreignPreset }).accentStrong, paletteToRoles(theme.palettes[0]).accentStrong)
 })
+
+test('every theme palette produces readable roles', async () => {
+  const themes = await Promise.all(
+    ['cinematic', 'jharokha', 'noor', 'laal-paar', 'nakshi-kantha', 'patrika'].map((id) => import(`../../src/themes/${id}/theme.js`).then((m) => m.default))
+  )
+  for (const theme of themes) {
+    for (const palette of theme.palettes) {
+      const r = paletteToRoles(palette)
+      const name = `${theme.id}/${palette.id}`
+      assert.ok(contrast(r.ink, r.bg) >= 7, `${name} ink`)
+      assert.ok(contrast(r.inkMuted, r.bg) >= 4.5, `${name} muted`)
+      assert.ok(contrast(r.onAccent, r.accent) >= 4.5, `${name} onAccent`)
+      assert.ok(contrast(r.accentStrong, r.bg) >= 4.5, `${name} accentStrong`)
+      assert.ok(contrast(r.onInverse, r.inverse) >= 7, `${name} inverse`)
+    }
+  }
+})

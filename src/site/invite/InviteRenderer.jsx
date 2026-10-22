@@ -6,7 +6,7 @@ import Footer from '../sections/Footer'
 import Nav from '../sections/Nav'
 import ScrollTools from '../sections/ScrollTools'
 import { initialsOf } from '../primitives/text'
-import { coupleNames, has, invocationFor, photo, resolveCopy, verseFrom } from '../compose'
+import { coupleNames, frameInset, has, invocationFor, photo, resolveCopy, verseFrom } from '../compose'
 import InviteCard from './InviteCard'
 import Hosts from './Hosts'
 import Countdown from './Countdown'
@@ -16,6 +16,7 @@ import Share from './Share'
 import LiveToday from './LiveToday'
 import Closing from './Closing'
 import OpeningGate from '@/themes/openings/OpeningGate'
+import { THEME_FRAMES } from '@/themes/variants'
 import { ceremonyWhen, formatEventDay } from '@/lib/dates'
 import { dateExtraLine, googleCalendarUrl } from '@/lib/calendar'
 import { countdownEvent, headlineEvent, inviteEvents, rsvpState, shareText, todaysEvents } from '@/lib/invitation'
@@ -37,6 +38,7 @@ export default function InviteRenderer({ site, content, theme, tradition, palett
   const v = theme.variants
   const ceremonies = content.ceremonies || []
   const live = mode === 'live'
+  const Frame = THEME_FRAMES[theme.frame]
 
   const nameLine = names.en || names.bn || ''
   const toEvent = (cer) => ({
@@ -88,53 +90,57 @@ export default function InviteRenderer({ site, content, theme, tradition, palett
       {banner}
       <Nav initials={initialsOf(names.en)} items={navItems} overDarkHero={v.hero === 'cinematic'} />
       <ScrollTools />
-      <main>
-        <Hero
-          variant={v.hero}
-          names={names}
-          date={date}
-          invocation={invocation}
-          media={{
-            image: has(invitation.cover) ? invitation.cover : has(hero.posterPath) ? hero.posterPath : null,
-            video: null,
-            position: (has(invitation.cover) ? invitation.coverPosition : hero.posterPosition) || '50% 50%',
-          }}
-          copy={copy}
-        />
-        {live && <LiveToday events={today} copy={copy} />}
-        <InviteCard
-          variant={v.invite}
-          ornament={theme.ornament}
-          eyebrow={copy['invite.eyebrow']}
-          wording={invitation.wording?.en || invitation.wording?.bn ? invitation.wording : copy['invite.wording']}
-          names={names}
-          date={date}
-          dateExtra={dateExtraLine(headline?.startsAt, tradition.dateExtras || [])}
-          verse={verse}
-        />
-        <Hosts variant={v.invite} hosts={invitation.hosts || []} copy={copy} />
-        {main && !live && <Countdown target={main.startsAt} title={main.title} copy={copy} />}
-        <Events variant={v.invite} events={events} copy={copy} />
-        {showRsvp && (
-          <Rsvp
-            slug={site.slug}
-            open={rsvp.open}
-            events={rsvp.events.map((e) => ({ id: e.id, title: e.title }))}
-            settings={{ maxParty: rsvp.settings.maxParty, collectPhone: rsvp.settings.collectPhone, note: rsvp.settings.note }}
-            deadline={deadline}
+      {Frame && <Frame names={names} />}
+      <div className={frameInset(theme.frame)}>
+        <main>
+          <Hero
+            variant={v.hero}
+            names={names}
+            date={date}
+            invocation={invocation}
+            media={{
+              image: has(invitation.cover) ? invitation.cover : has(hero.posterPath) ? hero.posterPath : null,
+              video: null,
+              position: (has(invitation.cover) ? invitation.coverPosition : hero.posterPosition) || '50% 50%',
+            }}
             copy={copy}
+            contents={navItems}
           />
-        )}
-        <Gallery variant={v.gallery} items={photos} albums={[]} copy={{ ...copy, 'gallery.title': copy['invite.photos.title'] }} viewerName={viewerName} mask={theme.shape.photoMask} />
-        {live && on('messages') && <Guestbook slug={site.slug} copy={copy} />}
-        <Share url={url} text={shareText({ names, date, url })} icsUrl={events.some((e) => e.startsAt) ? `/${site.slug}/calendar.ics` : null} qr={qr} copy={copy} />
-        <Closing
-          closing={invitation.closing?.en || invitation.closing?.bn ? invitation.closing : copy['invite.closing']}
-          signedBy={invitation.signedBy}
-          ornament={theme.ornament}
-        />
-      </main>
-      <Footer names={names} thankYou={c.footer?.thankYou} photographer={c.footer?.photographer} contact={site.public_contact || {}} copy={copy} year={String(headline?.startsAt || site.created_at || '').slice(0, 4)} />
+          {live && <LiveToday events={today} copy={copy} />}
+          <InviteCard
+            variant={v.invite}
+            ornament={theme.ornament}
+            eyebrow={copy['invite.eyebrow']}
+            wording={invitation.wording?.en || invitation.wording?.bn ? invitation.wording : copy['invite.wording']}
+            names={names}
+            date={date}
+            dateExtra={dateExtraLine(headline?.startsAt, tradition.dateExtras || [])}
+            verse={verse}
+          />
+          <Hosts variant={v.invite} hosts={invitation.hosts || []} copy={copy} />
+          {main && !live && <Countdown target={main.startsAt} title={main.title} copy={copy} />}
+          <Events variant={v.invite} events={events} copy={copy} />
+          {showRsvp && (
+            <Rsvp
+              slug={site.slug}
+              open={rsvp.open}
+              events={rsvp.events.map((e) => ({ id: e.id, title: e.title }))}
+              settings={{ maxParty: rsvp.settings.maxParty, collectPhone: rsvp.settings.collectPhone, note: rsvp.settings.note }}
+              deadline={deadline}
+              copy={copy}
+            />
+          )}
+          <Gallery variant={v.gallery} items={photos} albums={[]} copy={{ ...copy, 'gallery.title': copy['invite.photos.title'] }} viewerName={viewerName} mask={theme.shape.photoMask} />
+          {live && on('messages') && <Guestbook slug={site.slug} copy={copy} />}
+          <Share url={url} text={shareText({ names, date, url })} icsUrl={events.some((e) => e.startsAt) ? `/${site.slug}/calendar.ics` : null} qr={qr} copy={copy} />
+          <Closing
+            closing={invitation.closing?.en || invitation.closing?.bn ? invitation.closing : copy['invite.closing']}
+            signedBy={invitation.signedBy}
+            ornament={theme.ornament}
+          />
+        </main>
+        <Footer names={names} thankYou={c.footer?.thankYou} photographer={c.footer?.photographer} contact={site.public_contact || {}} copy={copy} year={String(headline?.startsAt || site.created_at || '').slice(0, 4)} />
+      </div>
     </ThemeRoot>
   )
 }

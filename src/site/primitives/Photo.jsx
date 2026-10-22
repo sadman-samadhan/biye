@@ -1,8 +1,8 @@
 /**
  * A wedding photo. Photos arrive pre-resized (thumb/web variants) as short-lived
  * signed URLs, so this is a plain <img> rather than next/image. Dragging and the
- * "save image" target are disabled together with MediaGuard; `mask="arch"`
- * clips it to the theme's arch shape.
+ * "save image" target are disabled together with MediaGuard; `mask` clips it
+ * to one of the theme shapes in ShapeDefs (arch, leaf, patch, dome).
  */
 export default function Photo({ src, thumb, alt = '', position = '50% 50%', mask, className = '', sizes, eager = false, width, height, lqip }) {
   if (!src) return null
@@ -24,7 +24,7 @@ export default function Photo({ src, thumb, alt = '', position = '50% 50%', mask
       className={className}
       style={{
         objectPosition: position || '50% 50%',
-        ...(mask === 'arch' ? { clipPath: 'url(#shb-arch)' } : {}),
+        ...(mask ? { clipPath: `url(#shb-${mask})` } : {}),
         ...(lqip ? { backgroundImage: `url(${lqip})`, backgroundSize: 'cover' } : {}),
       }}
     />

@@ -14,6 +14,7 @@
  *   order: section keys in page order
  *   variants: per-section layout variant ids (invite: the invitation's card, hosts and events layout)
  *   ornament: divider/frame ornament set id
+ *   frame: page-level decoration (themes/variants.js THEME_FRAMES), or null
  */
 export const SECTION_ORDER = ['hero', 'story', 'spotlight', 'monogram', 'ceremonies', 'gallery', 'blessings', 'guestbook']
 
@@ -37,6 +38,7 @@ const BASE = {
     nav: 'bar',
   },
   ornament: 'line',
+  frame: null,
 }
 
 export function defineTheme(theme) {

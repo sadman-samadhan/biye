@@ -1,8 +1,12 @@
 import cinematic from './cinematic/theme.js'
 import jharokha from './jharokha/theme.js'
+import noor from './noor/theme.js'
+import laalPaar from './laal-paar/theme.js'
+import nakshiKantha from './nakshi-kantha/theme.js'
+import patrika from './patrika/theme.js'
 
 /** All themes. Order here is the order pickers show them in. */
-export const THEMES = { cinematic, jharokha }
+export const THEMES = { cinematic, jharokha, noor, 'laal-paar': laalPaar, 'nakshi-kantha': nakshiKantha, patrika }
 
 const ALIASES = { classic: 'cinematic' }
 

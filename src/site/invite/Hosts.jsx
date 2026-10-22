@@ -39,7 +39,7 @@ function Host({ host, copy }) {
 export default function Hosts({ variant, hosts = [], copy }) {
   const shown = hosts.filter((h) => has(h.child?.en) || has(h.child?.bn) || has(h.parents?.en) || has(h.parents?.bn))
   if (!shown.length) return null
-  const arch = variant === 'arch'
+  const arch = variant === 'arch' || variant === 'light'
   return (
     <section id="families" className="bg-t-bg-alt px-5 py-20 md:py-28">
       <Reveal className="mx-auto max-w-4xl">

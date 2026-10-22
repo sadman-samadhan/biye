@@ -7,15 +7,17 @@ import { MonogramFrame } from '@/themes/ornaments'
  * The couple's crest: an uploaded/generated monogram image, or initials drawn
  * in the theme's frame. Shows the tradition's label and the opening verse.
  */
+const TALL = new Set(['arch', 'light'])
+
 export default function Monogram({ variant = 'ring', initials = [], logo, topLabel, verse }) {
-  const arch = variant === 'arch'
+  const arch = TALL.has(variant)
   return (
     <section className="bg-t-bg px-6 py-24 text-center md:py-32">
       <Reveal className="mx-auto max-w-3xl">
         {topLabel?.en && <p className="mx-auto mb-10 max-w-md text-[11px] uppercase tracking-[0.35em] text-t-ink-muted">{topLabel.en}</p>}
 
         <div className={`relative mx-auto text-t-ornament ${arch ? 'aspect-[5/6] w-56 md:w-64' : 'aspect-square w-56 md:w-64'}`}>
-          <MonogramFrame kind={arch ? 'arch' : 'ring'} />
+          <MonogramFrame kind={variant} />
           <div className={`absolute inset-0 flex items-center justify-center ${arch ? 'pt-10' : ''}`}>
             {logo ? (
               <Photo src={logo} alt="Monogram" className="h-[72%] w-[72%] object-contain" />

@@ -33,3 +33,8 @@ export function invocationFor(hero = {}, tradition) {
     ? { text: hero.openingInvocation, lang: tradition.invocation?.lang || 'ar', sub: hero.openingSub || '' }
     : tradition.invocation || null
 }
+
+/** Side padding that keeps content clear of a theme's page-edge decoration. */
+export function frameInset(frame) {
+  return frame === 'paar' ? 'px-2.5 md:px-7' : ''
+}

@@ -11,9 +11,10 @@ import Footer from './sections/Footer'
 import Nav from './sections/Nav'
 import ScrollTools from './sections/ScrollTools'
 import { initialsOf } from './primitives/text'
-import { coupleNames, has, invocationFor, photo, resolveCopy, verseFrom } from './compose'
+import { coupleNames, frameInset, has, invocationFor, photo, resolveCopy, verseFrom } from './compose'
 import { Divider } from '@/themes/ornaments'
 import OpeningGate from '@/themes/openings/OpeningGate'
+import { THEME_FRAMES } from '@/themes/variants'
 import { ceremonyWhen } from '@/lib/dates'
 
 /**
@@ -33,6 +34,8 @@ export default function SiteRenderer({ site, content, theme, tradition, paletteI
   const invocation = invocationFor(hero, tradition)
   const mask = theme.shape.photoMask
   const v = theme.variants
+  const Frame = THEME_FRAMES[theme.frame]
+  const inset = frameInset(theme.frame)
 
   const ceremonies = (content.ceremonies || [])
     .filter((cer) => cer && cer.enabled !== false)
@@ -63,6 +66,14 @@ export default function SiteRenderer({ site, content, theme, tradition, paletteI
   const year = String(firstEvent || site.created_at || '').slice(0, 4)
   const verse = verseFrom(c.blessing || hero.blessing || tradition.defaultBlessing)
 
+  const navItems = [
+    ...(on('story') && milestones.length ? [{ id: 'story', label: copy['nav.story'] }] : []),
+    ...(on('ceremonies') ? ceremonies.map((cer) => ({ id: cer.id, label: cer.title || { en: cer.id } })) : []),
+    ...(on('gallery') && gallery.length ? [{ id: 'gallery', label: copy['nav.gallery'] }] : []),
+    ...(on('blessings') && (duas.length || content.duas?.parentBlessings?.message) ? [{ id: 'blessings', label: copy['nav.blessings'] }] : []),
+    ...(on('messages') ? [{ id: 'guestbook', label: copy['nav.guestbook'] }] : []),
+  ]
+
   const sections = {
     hero: () => (
       <Hero
@@ -72,6 +83,7 @@ export default function SiteRenderer({ site, content, theme, tradition, paletteI
         invocation={invocation}
         media={{ image: has(hero.posterPath) ? hero.posterPath : null, video: hero.mediaType === 'video' && has(hero.videoPath) ? hero.videoPath : null, position: hero.posterPosition || '50% 50%' }}
         copy={copy}
+        contents={navItems}
       />
     ),
     story: () => on('story') && <Story variant={v.story} title={c.story?.title || copy['story.title']} milestones={milestones} copy={copy} mask={mask} />,
@@ -95,13 +107,6 @@ export default function SiteRenderer({ site, content, theme, tradition, paletteI
 
   const rendered = theme.order.map((key) => [key, sections[key]?.()]).filter(([, node]) => node && (!Array.isArray(node) || node.length))
 
-  const navItems = [
-    ...(on('story') && milestones.length ? [{ id: 'story', label: copy['nav.story'] }] : []),
-    ...(on('ceremonies') ? ceremonies.map((cer) => ({ id: cer.id, label: cer.title || { en: cer.id } })) : []),
-    ...(on('gallery') && gallery.length ? [{ id: 'gallery', label: copy['nav.gallery'] }] : []),
-    ...(on('blessings') && (duas.length || content.duas?.parentBlessings?.message) ? [{ id: 'blessings', label: copy['nav.blessings'] }] : []),
-    ...(on('messages') ? [{ id: 'guestbook', label: copy['nav.guestbook'] }] : []),
-  ]
 
   return (
     <ThemeRoot theme={theme} sitePalette={site.palette} paletteId={paletteId}>
@@ -109,15 +114,18 @@ export default function SiteRenderer({ site, content, theme, tradition, paletteI
       {banner}
       <Nav initials={initialsOf(names.en)} items={navItems} overDarkHero={v.hero === 'cinematic'} />
       <ScrollTools />
-      <main>
-        {rendered.map(([key, node], i) => (
-          <div key={key}>
-            {i > 0 && key !== 'spotlight' && rendered[i - 1][0] !== 'spotlight' && <Divider ornament={theme.ornament} />}
-            {node}
-          </div>
-        ))}
-      </main>
-      <Footer names={names} thankYou={c.footer?.thankYou} photographer={c.footer?.photographer} contact={site.public_contact || {}} copy={copy} year={year} />
+      {Frame && <Frame names={names} />}
+      <div className={inset}>
+        <main>
+          {rendered.map(([key, node], i) => (
+            <div key={key}>
+              {i > 0 && key !== 'spotlight' && rendered[i - 1][0] !== 'spotlight' && <Divider ornament={theme.ornament} />}
+              {node}
+            </div>
+          ))}
+        </main>
+        <Footer names={names} thankYou={c.footer?.thankYou} photographer={c.footer?.photographer} contact={site.public_contact || {}} copy={copy} year={year} />
+      </div>
     </ThemeRoot>
   )
 }
