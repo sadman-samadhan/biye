@@ -10,25 +10,11 @@ import Guestbook from './sections/Guestbook'
 import Footer from './sections/Footer'
 import Nav from './sections/Nav'
 import ScrollTools from './sections/ScrollTools'
-import { initialsOf, meaningOf, originalOf, referenceOf } from './primitives/text'
+import { initialsOf } from './primitives/text'
+import { coupleNames, has, invocationFor, photo, resolveCopy, verseFrom } from './compose'
 import { Divider } from '@/themes/ornaments'
 import OpeningGate from '@/themes/openings/OpeningGate'
-import { BASE_COPY, createCopy } from '@/traditions'
 import { ceremonyWhen } from '@/lib/dates'
-
-const has = (v) => typeof v === 'string' && v.trim()
-
-function verseFrom(blessing) {
-  if (!blessing) return null
-  const meaning = meaningOf(blessing)
-  const original = originalOf(blessing)
-  if (!original && !meaning.en && !meaning.bn) return null
-  return { original, meaning, reference: referenceOf(blessing) }
-}
-
-function photo(src, position) {
-  return has(src) ? { src, position: position || '50% 50%' } : null
-}
 
 /**
  * Server-side composition of a memories site: picks each section's variant
@@ -37,17 +23,14 @@ function photo(src, position) {
  * sections stay serializable.
  */
 export default function SiteRenderer({ site, content, theme, tradition, paletteId, viewerName, banner }) {
-  const copyFn = createCopy(tradition, content.content?.copy || {})
-  const copy = Object.fromEntries(Object.keys(BASE_COPY).map((key) => [key, copyFn(key)]))
+  const copy = resolveCopy(tradition, content.content?.copy || {})
 
   const c = content.content || {}
   const hero = c.hero || {}
   const toggles = c.sectionToggles || {}
   const on = (key) => toggles[key] !== false
-  const names = hero.coupleNames || { en: site.owner_name || '', bn: '' }
-  const invocation = has(hero.openingInvocation)
-    ? { text: hero.openingInvocation, lang: tradition.invocation?.lang || 'ar', sub: hero.openingSub || '' }
-    : tradition.invocation || null
+  const names = coupleNames(site, content)
+  const invocation = invocationFor(hero, tradition)
   const mask = theme.shape.photoMask
   const v = theme.variants
 

@@ -36,6 +36,10 @@ export async function POST(req) {
 
   const supabase = await ssrClient()
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  // Supabase's own sign-in limit: not a wrong password, so don't count it as one
+  if (error?.status === 429) {
+    return NextResponse.json({ error: 'Too many sign-ins right now. Please wait a few minutes.' }, { status: 429 })
+  }
   if (error || !data?.user) {
     await rateLimitHit(ipKey, IP_FAILURES)
     await rateLimitHit(emailKey, EMAIL_FAILURES)

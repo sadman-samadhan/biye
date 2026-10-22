@@ -18,6 +18,7 @@ const VALID_ROW = {
   sites: () => ({ slug: `smoke-${Date.now()}` }),
   site_content: () => ({ site_id: crypto.randomUUID() }),
   messages: () => ({ name: 'smoke', message: 'smoke' }),
+  rsvps: () => ({ site_id: crypto.randomUUID(), name: 'smoke', attending: true }),
 }
 
 const results = []
@@ -53,7 +54,7 @@ async function supabaseProbes() {
   const h = { apikey: ANON, Authorization: `Bearer ${ANON}`, 'Content-Type': 'application/json' }
   const rest = `${SUPABASE_URL}/rest/v1`
 
-  for (const table of ['sites', 'site_content', 'messages']) {
+  for (const table of ['sites', 'site_content', 'messages', 'rsvps']) {
     await probe(`anon SELECT ${table}`, `${rest}/${table}?select=*&limit=1`, { headers: h }, { allowEmptyArray: true })
     await probe(`anon INSERT ${table}`, `${rest}/${table}`, {
       method: 'POST',
@@ -134,6 +135,8 @@ async function appProbes() {
     await probe(`PATCH /api/sites/x/access (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/access`, { method: 'PATCH', headers: { ...headers, ...json }, body: '{"siteAccess":"public"}' })
     await probe(`POST /api/sites/x/access/passcode (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/access/passcode`, { method: 'POST', headers: { ...headers, ...json }, body: '{"passcode":"attacker-1234"}' })
     await probe(`POST /api/sites/x/access/revoke (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/access/revoke`, { method: 'POST', headers: { ...headers, ...json }, body: '{}' })
+    await probe(`GET /api/sites/x/rsvps (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/rsvps?format=csv`, { headers })
+    await probe(`DELETE /api/sites/x/rsvps/y (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/rsvps/00000000-0000-0000-0000-000000000000`, { method: 'DELETE', headers })
     await probe(`POST /api/sites/x/palette (${label})`, `${BASE}/api/sites/00000000-0000-0000-0000-000000000000/palette`, { method: 'POST', headers: { ...headers, ...json }, body: '{"media":"media:00000000-0000-0000-0000-000000000000"}' })
   }
   await probe('GET /admin redirects to login', `${BASE}/admin`)

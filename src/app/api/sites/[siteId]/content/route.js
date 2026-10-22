@@ -4,6 +4,7 @@ import { serviceClient } from '@/lib/server/supabase'
 import { writeAudit } from '@/lib/server/site-data'
 import { CONTENT_SECTIONS, COLUMN_SECTIONS, validateSection } from '@/lib/content/schema'
 import { collectUnreferencedMedia } from '@/lib/server/media/gc'
+import { collectMediaIds } from '@/lib/media-ref'
 
 /**
  * Save one section of a site's content.
@@ -63,6 +64,12 @@ export async function PATCH(req, { params }) {
     ;({ error } = await supabase.from('site_content').insert({ site_id: siteId, ...update, version: nextVersion }))
   }
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Photos on the invitation are meant for every guest, including on a public invitation
+  if (section === 'invitation') {
+    const ids = [...collectMediaIds(result.data)]
+    if (ids.length) await supabase.from('media').update({ is_public: true }).eq('site_id', siteId).in('id', ids)
+  }
 
   await writeAudit({
     actorKind: isAdmin ? 'admin' : 'member',

@@ -70,7 +70,7 @@ if (existing) {
 
 const { site } = await call('/api/admin/sites', {
   method: 'POST',
-  body: { slug: SLUG, status: 'live', wedding_type: TRADITION, products: ['site'], owner_name: 'Ayesha & Rafiq', content: { hero: { coupleNames: { en: 'Ayesha & Rafiq', bn: 'আয়েশা ও রফিক' } } } },
+  body: { slug: SLUG, status: 'live', wedding_type: TRADITION, products: ['invite', 'site'], owner_name: 'Ayesha & Rafiq', content: { hero: { coupleNames: { en: 'Ayesha & Rafiq', bn: 'আয়েশা ও রফিক' } } } },
 })
 console.log('site', site.id)
 
@@ -126,7 +126,7 @@ await save('blessing', tradition.defaultBlessing)
 const extras = {
   'gaye-holud': { heroImage: t.holud, carouselImages: [{ url: t.holud }, { url: t.c1 }, { url: t.g6 }], startsAt: '2026-12-10T17:00:00+06:00', venue: { en: 'Family home, Dhanmondi', bn: 'পারিবারিক বাসভবন, ধানমন্ডি', mapUrl: 'https://maps.app.goo.gl/example1' } },
   akht: { heroImage: t.akht, startsAt: '2026-12-11T11:00:00+06:00', venue: { en: 'Baitul Aman Mosque', bn: 'বায়তুল আমান মসজিদ', mapUrl: 'https://maps.app.goo.gl/example2' } },
-  biye: { heroImage: t.biye, startsAt: '2026-12-12T19:30:00+06:00', venue: { en: 'Bashundhara Convention Centre', bn: 'বসুন্ধরা কনভেনশন সেন্টার', mapUrl: 'https://maps.app.goo.gl/example3' } },
+  biye: { heroImage: t.biye, startsAt: '2026-12-12T19:30:00+06:00', endsAt: '2026-12-12T23:00:00+06:00', liveStreamUrl: 'https://youtube.com/live/example', venue: { en: 'Bashundhara Convention Centre', bn: 'বসুন্ধরা কনভেনশন সেন্টার', address: { en: 'Kuril, Dhaka 1229', bn: 'কুড়িল, ঢাকা ১২২৯' }, mapUrl: 'https://maps.app.goo.gl/example3' } },
   'bou-bhat': { heroImage: t.bou, carouselImages: [{ url: t.bou }, { url: t.c2 }], startsAt: '2026-12-14T13:00:00+06:00', venue: { en: 'Gulshan Club', bn: 'গুলশান ক্লাব' } },
 }
 await save(
@@ -145,5 +145,16 @@ await save('gallery', [
   { filename: t.g6, category: 'gaye-holud', alt: 'Blessing' },
   { filename: t.c2, category: 'bou-bhat', alt: 'Stage' },
 ])
+await save('invitation', {
+  hosts: [
+    { side: 'bride', relation: 'daughter', child: { en: 'Ayesha Rahman', bn: 'আয়েশা রহমান' }, parents: { en: 'Mr. Abdur Rahman & Mrs. Rokeya Rahman', bn: 'জনাব আব্দুর রহমান ও মিসেস রোকেয়া রহমান' }, address: { en: 'Dhanmondi, Dhaka', bn: 'ধানমন্ডি, ঢাকা' } },
+    { side: 'groom', relation: 'son', child: { en: 'Rafiq Chowdhury', bn: 'রফিক চৌধুরী' }, parents: { en: 'Mr. Kamal Chowdhury & Mrs. Nasrin Chowdhury', bn: 'জনাব কামাল চৌধুরী ও মিসেস নাসরিন চৌধুরী' }, address: { en: 'Chattogram', bn: 'চট্টগ্রাম' } },
+  ],
+  signedBy: { en: 'The Rahman and Chowdhury families', bn: 'রহমান ও চৌধুরী পরিবার' },
+  cover: t.hero,
+  coverPosition: '50% 30%',
+  photos: [{ url: t.spot }, { url: t.s1 }, { url: t.s3 }, { url: t.c1 }],
+  rsvp: { enabled: true, deadline: '2026-12-01', maxParty: 6, collectPhone: true },
+})
 await call(`/api/sites/${site.id}/access`, { method: 'PATCH', body: { siteAccess: 'public', inviteAccess: 'public' } })
 console.log(`ready: ${BASE}/${SLUG}`)

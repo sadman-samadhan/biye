@@ -95,6 +95,11 @@ const tradition = {
     'blessings.intro': { en: 'From the Maṅgala Sutta', bn: 'মঙ্গল সূত্র থেকে' },
     'spotlight.eyebrow': { en: 'A Blessed Path', bn: 'মঙ্গলময় পথচলা' },
     'monogram.topLabel': { en: 'With metta, together with their families', bn: 'মৈত্রীময় আশীর্বাদে, দুই পরিবারের সাথে' },
+    'invite.wording': {
+      en: 'With the blessings of the Triple Gem, we warmly invite you and your family to the wedding of our children',
+      bn: 'ত্রিরত্নের আশীর্বাদে আমাদের সন্তানদের শুভ বিবাহে আপনাকে সপরিবারে সাদর আমন্ত্রণ',
+    },
+    'invite.closing': { en: 'With metta', bn: 'মৈত্রীসহ' },
   },
 }
 

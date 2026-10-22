@@ -53,6 +53,6 @@ export default defineTheme({
   type: { displayCase: 'upper', displayTracking: '0.08em' },
   shape: { radius: '0', photoMask: 'arch' },
   opening: 'arch-doors',
-  variants: { hero: 'arch', story: 'medallion', spotlight: 'arch-split', monogram: 'arch', ceremony: 'iwan', gallery: 'arch-grid', blessings: 'panel' },
+  variants: { hero: 'arch', story: 'medallion', spotlight: 'arch-split', monogram: 'arch', ceremony: 'iwan', gallery: 'arch-grid', blessings: 'panel', invite: 'arch' },
   ornament: 'girih',
 })

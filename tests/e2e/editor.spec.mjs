@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { OPERATOR, signIn, testPhoto } from './helpers.mjs'
+import { OPERATOR, panel, signIn, testPhoto } from './helpers.mjs'
 
 test('operator creates a site, edits every core section and publishes it', async ({ page, browser }) => {
   await signIn(page, OPERATOR)
@@ -22,33 +22,33 @@ test('operator creates a site, edits every core section and publishes it', async
 
   // 3. Opening: upload a cover photo
   await page.getByRole('navigation', { name: 'Editor sections' }).getByRole('button', { name: 'Opening' }).click()
-  const opening = page.locator('div:not([hidden]) > section').filter({ hasText: 'Opening' })
+  const opening = panel(page, 'Opening')
   await opening.locator('input[type=file]').first().setInputFiles(await testPhoto('cover.jpg', 20))
-  await expect(opening.getByText('Replace')).toBeVisible()
+  await expect(opening.getByText('Replace')).toBeVisible({ timeout: 60_000 }) // uploads resize on the server
   await opening.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByText('Opening saved')).toBeVisible()
 
   // 4. Ceremonies: add a preset, set venue + map link
   await page.getByRole('navigation', { name: 'Editor sections' }).getByRole('button', { name: 'Ceremonies' }).click()
-  const ceremonies = page.locator('div:not([hidden]) > section').filter({ hasText: 'Ceremonies' })
+  const ceremonies = panel(page, 'Ceremonies')
   await ceremonies.getByRole('button', { name: /Sangeet Night/ }).click()
   await ceremonies.getByRole('textbox', { name: 'Venue (English)' }).fill('Dhanmondi Lake Pavilion')
-  await ceremonies.getByLabel('Google Maps link').fill('https://maps.app.goo.gl/example')
+  await ceremonies.getByLabel('Map link').fill('https://maps.app.goo.gl/example')
   await ceremonies.getByLabel('Starts (Dhaka time)').fill('2026-12-10T18:30')
   await ceremonies.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByText('Ceremonies saved')).toBeVisible()
 
   // 5. Gallery: two photos into the wedding album
   await page.getByRole('navigation', { name: 'Editor sections' }).getByRole('button', { name: 'Gallery' }).click()
-  const gallery = page.locator('div:not([hidden]) > section').filter({ hasText: 'Gallery' })
+  const gallery = panel(page, 'Gallery')
   await gallery.locator('input[type=file]').setInputFiles([await testPhoto('a.jpg', 200), await testPhoto('b.jpg', 320)])
-  await expect(gallery.getByRole('listitem')).toHaveCount(2)
+  await expect(gallery.getByRole('listitem')).toHaveCount(2, { timeout: 60_000 })
   await gallery.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByText('Gallery saved')).toBeVisible()
 
   // 6. Look: Jharokha theme with its second palette, hide the guestbook
   await page.getByRole('navigation', { name: 'Editor sections' }).getByRole('button', { name: 'Theme & colours' }).click()
-  const look = page.locator('div:not([hidden]) > section').filter({ hasText: 'Theme & colours' })
+  const look = panel(page, 'Theme & colours')
   await look.getByRole('radiogroup', { name: 'Theme' }).getByRole('radio', { name: /Jharokha/ }).click()
   await look.getByRole('radiogroup', { name: 'Colour palette' }).getByRole('radio').nth(1).click()
   await look.getByRole('switch', { name: 'Guestbook' }).click()
@@ -57,14 +57,14 @@ test('operator creates a site, edits every core section and publishes it', async
 
   // 7. Couple access: invite link
   await page.getByRole('navigation', { name: 'Editor sections' }).getByRole('button', { name: 'Couple access' }).click()
-  const access = page.locator('div:not([hidden]) > section').filter({ hasText: 'Couple access' })
+  const access = panel(page, 'Couple access')
   await access.getByLabel('Email').fill(`nadia-${stamp}@example.com`)
   await access.getByRole('button', { name: 'Create invite link' }).click()
   await expect(access.getByText(/\/auth\/confirm\?token_hash=/)).toBeVisible()
 
   // 8. Publish
   await page.getByRole('navigation', { name: 'Editor sections' }).getByRole('button', { name: 'Site settings' }).click()
-  const settings = page.locator('div:not([hidden]) > section').filter({ hasText: 'Site settings' })
+  const settings = panel(page, 'Site settings')
   await settings.getByLabel('Status').selectOption('live')
   await settings.getByRole('button', { name: 'Save changes' }).click()
   await expect(page.getByText('Site settings saved')).toBeVisible()
@@ -85,8 +85,9 @@ test('operator creates a site, edits every core section and publishes it', async
   await expect(guestPage.locator('img[src*="/object/sign/"]')).toHaveCount(0)
 
   // 11. Make the invitation passcode-only: the guest must now enter it
+  const accessSaved = page.waitForResponse((r) => r.url().endsWith('/access') && r.request().method() === 'PATCH' && r.ok())
   await privacy.page().getByLabel('Invitation (before the wedding)').selectOption('passcode')
-  await expect(page.getByText('Saved').first()).toBeVisible()
+  await accessSaved
   await guestPage.reload()
   await expect(guestPage.getByText('Enter the passcode from your invitation')).toBeVisible()
   await expect(guestPage.locator('body')).not.toContainText('Dhanmondi Lake Pavilion')

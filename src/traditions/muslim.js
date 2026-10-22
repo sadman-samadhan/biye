@@ -38,6 +38,11 @@ const tradition = {
     'spotlight.eyebrow': { en: 'A Blessed Union', bn: 'বরকতময় বন্ধন' },
     'monogram.topLabel': { en: 'In the name of Allah, the Most Gracious, the Most Merciful', bn: 'পরম করুণাময় অসীম দয়ালু আল্লাহর নামে' },
     'guestbook.title': { en: 'Leave Your Duas', bn: 'আপনার দোয়া ও শুভকামনা জানান' },
+    'invite.wording': {
+      en: 'By the grace of Almighty Allah, we joyfully invite you and your family to the wedding of our children',
+      bn: 'মহান আল্লাহর অশেষ রহমতে আমাদের সন্তানদের শুভ বিবাহে আপনাকে সপরিবারে সাদর আমন্ত্রণ জানাচ্ছি',
+    },
+    'invite.closing': { en: 'With duas and warm regards', bn: 'দোয়াপ্রার্থী' },
   },
 }
 

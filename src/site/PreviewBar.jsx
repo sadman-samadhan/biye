@@ -9,9 +9,10 @@ const STATUS = { draft: 'Draft — guests can’t see this yet', archived: 'In T
 
 /**
  * Shown only to the couple and operators. Try other themes and palettes on the
- * real site (?theme=&palette=), then apply one or go back.
+ * real site (?theme=&palette=), then apply one or go back. When the site has an
+ * invitation, switch between it and the full site.
  */
-export default function PreviewBar({ siteId, slug, status, isAdmin, themeId, savedThemeId, paletteId, previewing }) {
+export default function PreviewBar({ siteId, slug, status, isAdmin, themeId, savedThemeId, paletteId, previewing, views }) {
   const router = useRouter()
   const pathname = usePathname()
   const [open, setOpen] = useState(Boolean(previewing))
@@ -60,6 +61,18 @@ export default function PreviewBar({ siteId, slug, status, isAdmin, themeId, sav
         <div className="flex flex-wrap items-center gap-2 px-4 py-2.5">
           <Eye size={16} className="text-[#B05A10]" />
           <span className="min-w-0 flex-1 truncate font-medium">{previewing ? `Previewing ${theme.name.en}` : STATUS[status] || 'Preview'}</span>
+          {views && (
+            <span className="flex overflow-hidden rounded-md border border-[#E8DFD2]">
+              {[
+                ['invite', 'Invitation', `/${slug}/invite`],
+                ['memories', 'Full site', `/${slug}/memories`],
+              ].map(([id, label, href]) => (
+                <a key={id} href={href} aria-current={views.current === id ? 'page' : undefined} className={`px-2 py-1 ${views.current === id ? 'bg-[#1E1A17] text-white' : 'hover:bg-[#F4ECDF]'}`}>
+                  {label}
+                </a>
+              ))}
+            </span>
+          )}
           <a href={editor} className="rounded-md px-2 py-1 text-[#6B625A] hover:bg-[#F4ECDF]">
             Editor
           </a>

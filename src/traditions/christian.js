@@ -97,6 +97,11 @@ const tradition = {
     'blessings.intro': { en: 'Words we hold close as we begin', bn: 'নতুন জীবনের শুরুতে যে বাণী আমাদের সাথে' },
     'spotlight.eyebrow': { en: 'Two Become One', bn: 'দুটি জীবন এক হলো' },
     'monogram.topLabel': { en: 'By the grace of God, together with their families', bn: 'ঈশ্বরের অনুগ্রহে, দুই পরিবারের আশীর্বাদে' },
+    'invite.wording': {
+      en: 'By the grace of God, together with our families, we request the honour of your presence at our marriage',
+      bn: 'ঈশ্বরের অনুগ্রহে আমাদের শুভ বিবাহে আপনাকে সপরিবারে সাদর আমন্ত্রণ',
+    },
+    'invite.closing': { en: 'In His love', bn: 'প্রভুর প্রেমে' },
   },
 }
 

@@ -12,7 +12,7 @@
  *   shape: { radius, photoMask: null|'arch' }
  *   opening: 'none' | 'film' | 'arch-doors' | …
  *   order: section keys in page order
- *   variants: per-section layout variant ids
+ *   variants: per-section layout variant ids (invite: the invitation's card, hosts and events layout)
  *   ornament: divider/frame ornament set id
  */
 export const SECTION_ORDER = ['hero', 'story', 'spotlight', 'monogram', 'ceremonies', 'gallery', 'blessings', 'guestbook']
@@ -33,6 +33,7 @@ const BASE = {
     ceremony: 'parallax',
     gallery: 'masonry',
     blessings: 'classic',
+    invite: 'classic',
     nav: 'bar',
   },
   ornament: 'line',

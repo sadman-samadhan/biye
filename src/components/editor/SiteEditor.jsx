@@ -18,12 +18,15 @@ import MonogramPanel from './panels/MonogramPanel'
 import FooterPanel from './panels/FooterPanel'
 import MessagesPanel from './panels/MessagesPanel'
 import AccessPanel from './panels/AccessPanel'
+import InvitationPanel from './panels/InvitationPanel'
+import RsvpsPanel from './panels/RsvpsPanel'
 import AdminSettingsPanel from './panels/AdminSettingsPanel'
 import MembersPanel from './panels/MembersPanel'
 
 const PANELS = [
   { key: 'couple', group: 'Basics', label: 'Couple & date', Component: CouplePanel },
   { key: 'look', group: 'Basics', label: 'Theme & colours', Component: LookPanel },
+  { key: 'invitation', group: 'Content', label: 'Invitation', Component: InvitationPanel },
   { key: 'hero', group: 'Content', label: 'Opening', Component: HeroPanel },
   { key: 'story', group: 'Content', label: 'Our story', Component: StoryPanel },
   { key: 'spotlight', group: 'Content', label: 'Spotlight', Component: SpotlightPanel },
@@ -33,6 +36,7 @@ const PANELS = [
   { key: 'blessings', group: 'Content', label: 'Blessings', Component: BlessingsPanel },
   { key: 'footer', group: 'Content', label: 'Closing & contact', Component: FooterPanel },
   { key: 'access', group: 'Guests', label: 'Privacy & sharing', Component: AccessPanel },
+  { key: 'rsvps', group: 'Guests', label: 'RSVPs', Component: RsvpsPanel },
   { key: 'messages', group: 'Guests', label: 'Guestbook', Component: MessagesPanel },
   { key: 'settings', group: 'Operator', label: 'Site settings', Component: AdminSettingsPanel, adminOnly: true },
   { key: 'members', group: 'Operator', label: 'Couple access', Component: MembersPanel, adminOnly: true },
@@ -153,7 +157,7 @@ function LoadedEditor({ siteId, mode, data, saveContent, saveSettings, setMessag
         <div className="min-w-0">
           {panels.map(({ key, Component }) => (
             <div key={key} hidden={active !== key}>
-              <Component {...shared} onDirtyChange={markDirty[key]} />
+              <Component {...shared} active={active === key} onDirtyChange={markDirty[key]} />
             </div>
           ))}
         </div>

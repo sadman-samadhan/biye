@@ -37,6 +37,11 @@ const base = {
     'spotlight.eyebrow': { en: 'Shubho Bibaho', bn: 'শুভ বিবাহ' },
     'monogram.topLabel': { en: 'With the blessings of the gods and our elders', bn: 'দেবতা ও গুরুজনদের আশীর্বাদে' },
     'guestbook.title': { en: 'Leave Your Blessings', bn: 'আপনার আশীর্বাদ জানান' },
+    'invite.wording': {
+      en: 'With the blessings of the gods and our elders, we cordially invite you and your family to the auspicious wedding of our children',
+      bn: 'আমাদের সন্তানদের শুভ বিবাহে আপনি সবান্ধবে উপস্থিত থেকে নবদম্পতিকে আশীর্বাদ করে বাধিত করবেন',
+    },
+    'invite.closing': { en: 'With regards', bn: 'বিনীত' },
   },
 }
 

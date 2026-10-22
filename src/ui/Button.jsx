@@ -33,11 +33,20 @@ export default function Button({
       {children}
     </>
   )
-  if (href) {
+  if (href && disabled) {
     return (
-      <Link href={href} className={classes} {...props}>
+      <span aria-disabled="true" className={`${classes} cursor-not-allowed opacity-50`}>
         {content}
-      </Link>
+      </span>
+    )
+  }
+  if (href) {
+    // File downloads and API routes are plain links (client-side navigation can't fetch them)
+    const Tag = props.download !== undefined || href.startsWith('/api/') ? 'a' : Link
+    return (
+      <Tag href={href} className={classes} {...props}>
+        {content}
+      </Tag>
     )
   }
   return (

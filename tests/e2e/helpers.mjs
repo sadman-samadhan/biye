@@ -20,3 +20,6 @@ export async function testPhoto(name = 'photo.jpg', hue = 30) {
 }
 
 export const uniqueSlug = (prefix) => `${prefix}-${Date.now().toString(36)}`
+
+/** The visible editor panel with this exact title. */
+export const panel = (page, title) => page.locator('section').filter({ has: page.getByRole('heading', { name: title, exact: true, level: 2 }) })

@@ -9,6 +9,7 @@ import PanelFrame from '../PanelFrame'
 import MediaField from '../MediaField'
 import { usePanelDraft } from '../usePanelDraft'
 import { useMediaUrls } from '../media-context'
+import { isLiveStreamUrl, isMapUrl } from '@/lib/invitation'
 
 const DHAKA_OFFSET = '+06:00'
 
@@ -80,16 +81,35 @@ function CeremonyEditor({ ceremony, onChange, upload }) {
         <div className="sm:col-span-2">
           <BilingualField label="Venue" value={ceremony.venue} onChange={(venue) => set({ venue: { ...ceremony.venue, ...venue } })} />
         </div>
+        <div className="sm:col-span-2">
+          <BilingualField label="Address (optional)" value={ceremony.venue?.address} onChange={(address) => set({ venue: { ...ceremony.venue, address } })} />
+        </div>
         <TextInput
           className="sm:col-span-2"
-          label="Google Maps link"
+          label="Map link"
           type="url"
           inputMode="url"
           placeholder="https://maps.app.goo.gl/…"
           value={ceremony.venue?.mapUrl || ''}
           onChange={(e) => set({ venue: { ...ceremony.venue, mapUrl: e.target.value.trim() } })}
+          error={ceremony.venue?.mapUrl && !isMapUrl(ceremony.venue.mapUrl) ? 'Use a Google Maps or Apple Maps link' : null}
           hint="In Google Maps tap Share → Copy link."
         />
+        <TextInput
+          className="sm:col-span-2"
+          label="Livestream link (optional)"
+          type="url"
+          inputMode="url"
+          placeholder="https://youtube.com/live/…"
+          value={ceremony.liveStreamUrl || ''}
+          onChange={(e) => set({ liveStreamUrl: e.target.value.trim() })}
+          error={ceremony.liveStreamUrl && !isLiveStreamUrl(ceremony.liveStreamUrl) ? 'Use a YouTube or Facebook link' : null}
+          hint="YouTube or Facebook. Shown as “Watch live” on the invitation."
+        />
+        <div className="space-y-3 sm:col-span-2">
+          <Switch label="Show on the invitation" checked={ceremony.onInvite !== false} onChange={(onInvite) => set({ onInvite })} />
+          <Switch label="Guests can RSVP to this event" checked={ceremony.rsvp !== false} disabled={ceremony.onInvite === false} onChange={(rsvp) => set({ rsvp })} />
+        </div>
       </div>
 
       <MediaField

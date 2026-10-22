@@ -11,6 +11,7 @@ const nextConfig = {
   // Bundled OFL fonts for server-side rendering (monograms, share cards)
   outputFileTracingIncludes: {
     '/api/sites/[siteId]/monogram': ['./assets/fonts/**'],
+    '/[slug]/og.jpg': ['./assets/fonts/**'],
   },
   images: {
     // Photos are pre-resized into thumb/web variants at upload and served through
