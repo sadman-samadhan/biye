@@ -2,17 +2,29 @@
 
 import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
-import { Copy, Download, Plus, QrCode, Share2, Trash2 } from 'lucide-react'
+import { Copy, Download, Plus, QrCode, RefreshCw, Share2, Trash2 } from 'lucide-react'
 import { Button, TextInput, useToast } from '@/ui'
 import { newGuestListId } from '@/lib/invitation'
+import { generatePasscode, normalizePasscode } from '@/lib/passcode'
 
-/** Links for one saved list: plain (asks for the passcode) and one-tap (passcode built in). */
+const randomInt = (n) => globalThis.crypto.getRandomValues(new Uint32Array(1))[0] % n
+
+/** A passcode no other list (and not the site passcode) uses. */
+function freshPasscode(taken) {
+  const used = new Set(taken.filter(Boolean).map(normalizePasscode))
+  for (;;) {
+    const code = generatePasscode(randomInt)
+    if (!used.has(code)) return code
+  }
+}
+
+/** Links for one saved list: plain (asks for the list's passcode) and one-tap (passcode built in). */
 function ListLinks({ list, access, slug }) {
   const toast = useToast()
   const [qr, setQr] = useState(null)
   const url = `${access.siteUrl}/i/${list.id}`
-  const oneTap = access.unlockUrl ? `${access.unlockUrl}?list=${list.id}` : null
-  const message = [`You're invited to our wedding!`, oneTap || url, !oneTap && access.passcode ? `Passcode: ${access.passcode}` : null].filter(Boolean).join('\n')
+  const oneTap = access.listUnlockUrls?.[list.id] || null
+  const message = oneTap ? `You're invited to our wedding!\n${oneTap}` : `You're invited to our wedding!\n${url}\nPasscode: ${list.passcode}`
 
   async function copy(text, what) {
     try {
@@ -55,7 +67,7 @@ function ListLinks({ list, access, slug }) {
           {/* eslint-disable-next-line @next/next/no-img-element -- generated QR data URL */}
           <img src={qr} alt={`QR code for ${list.name}`} className="h-28 w-28 rounded-lg bg-white p-1" />
           <div className="space-y-1 text-xs text-sb-muted">
-            <p>For printed cards for this group. It asks for the passcode.</p>
+            <p>For printed cards for this group. Print the passcode {list.passcode} next to it.</p>
             <a href={qr} download={`${slug}-${list.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-qr.png`} className="inline-flex items-center gap-1.5 text-sm font-medium text-sb-marigold-deep hover:underline">
               <Download size={14} /> Download PNG
             </a>
@@ -67,21 +79,25 @@ function ListLinks({ list, access, slug }) {
 }
 
 /**
- * Guest lists: most guests are invited to some events, not all. Each list gets
- * its own link, and its invitation shows only the ticked events.
+ * Guest lists: most guests are invited to some events, not all. Each list has
+ * its own link and passcode, and a guest who comes in through them only ever
+ * sees the ticked events, even on the main link.
  */
 export default function GuestListsSection({ lists, onChange, events, savedLists = [], siteId, slug }) {
   const [access, setAccess] = useState(null)
+  // One-tap links depend on each saved list's passcode, so reload them after a save
+  const savedKey = savedLists.map((l) => `${l.id}:${l.passcode || ''}`).join()
 
   useEffect(() => {
     fetch(`/api/sites/${siteId}/access`, { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then(setAccess)
       .catch(() => {})
-  }, [siteId])
+  }, [siteId, savedKey])
 
+  const taken = (except) => [access?.passcode, ...lists.filter((l) => l.id !== except).map((l) => l.passcode)]
   const set = (i, patch) => onChange(lists.map((l, j) => (j === i ? { ...l, ...patch } : l)))
-  const add = () => onChange([...lists, { id: newGuestListId(), name: '', events: events.map((e) => e.id) }])
+  const add = () => onChange([...lists, { id: newGuestListId(), name: '', events: events.map((e) => e.id), passcode: freshPasscode(taken()) }])
   const remove = (i) => onChange(lists.filter((_, j) => j !== i))
   const toggle = (i, id) => {
     const chosen = lists[i].events.includes(id) ? lists[i].events.filter((e) => e !== id) : [...lists[i].events, id]
@@ -90,18 +106,26 @@ export default function GuestListsSection({ lists, onChange, events, savedLists 
   // A list's links work once it is saved unchanged
   const saved = (list) => {
     const s = savedLists.find((l) => l.id === list.id)
-    return s && s.name === list.name && s.events.join() === list.events.join()
+    return s && s.name === list.name && s.events.join() === list.events.join() && s.passcode === list.passcode
   }
+  const clashesWithSite = (list) => access?.passcode && list.passcode && normalizePasscode(access.passcode) === normalizePasscode(list.passcode)
 
   return (
     <section className="space-y-4 rounded-xl border border-sb-line p-4">
       <div>
         <p className="text-sm font-medium text-sb-ink">Guest lists</p>
         <p className="mt-1 text-xs text-sb-muted">
-          Not everyone is invited to every event. Make a list for each group of guests and send each group its own link: their invitation, countdown and RSVP show only their events. Your main link
-          still shows every event.
+          Not everyone is invited to every event. Make a list for each group of guests and send each group its own link or passcode: their invitation, countdown and RSVP show only their
+          events, even if they open your main link. Your main link and site passcode show every event, so keep those for the people invited to everything.
         </p>
       </div>
+
+      {access?.inviteAccess === 'public' && lists.length > 0 && (
+        <p className="rounded-lg bg-[#FCF3E6] px-3 py-2 text-xs text-[#7A4A12]">
+          Your invitation is public, so anyone who opens your main link without a list’s link sees every event. To keep the lists apart, set the invitation to need a passcode in Privacy &amp;
+          sharing.
+        </p>
+      )}
 
       {events.length === 0 && <p className="text-xs text-sb-muted">Add events in Ceremonies first.</p>}
 
@@ -126,8 +150,18 @@ export default function GuestListsSection({ lists, onChange, events, savedLists 
             </div>
             {list.events.length === 0 && <p className="mt-2 text-xs text-sb-alta">Choose at least one event.</p>}
           </fieldset>
-          {!saved(list) ? (
-            <p className="text-xs text-sb-muted">Save to get this list’s link.</p>
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-xs font-medium uppercase tracking-wider text-sb-muted">Passcode</span>
+            {list.passcode ? <span className="rounded-md bg-sb-paper px-2 py-1 font-mono text-sb-ink">{list.passcode}</span> : <span className="text-xs text-sb-alta">None yet</span>}
+            <Button size="sm" variant="ghost" icon={RefreshCw} onClick={() => set(i, { passcode: freshPasscode(taken(list.id)) })}>
+              {list.passcode ? 'New passcode' : 'Give this list a passcode'}
+            </Button>
+          </div>
+          {clashesWithSite(list) && <p className="text-xs text-sb-alta">This is the same as your site passcode, which opens every event. Choose a new one.</p>}
+          {!list.passcode ? (
+            <p className="text-xs text-sb-muted">Give this list a passcode and save to get its link.</p>
+          ) : !saved(list) ? (
+            <p className="text-xs text-sb-muted">Save to get this list’s link. A new passcode turns the old one and its one-tap link off.</p>
           ) : access ? (
             <ListLinks list={list} access={access} slug={slug} />
           ) : (

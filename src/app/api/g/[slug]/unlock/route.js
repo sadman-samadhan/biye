@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { randomBytes } from 'node:crypto'
+import { randomBytes, timingSafeEqual } from 'node:crypto'
 import { assertSameOrigin } from '@/lib/server/auth'
 import { getSiteForRequest } from '@/lib/server/site-view'
 import { passcodeMatches, setGuestSession } from '@/lib/server/guest-access'
 import { clientKey, rateLimitBlocked, rateLimitHit } from '@/lib/server/rate-limit'
+import { getSiteContent } from '@/lib/server/site-data'
+import { guestListFor } from '@/lib/invitation'
+import { normalizePasscode } from '@/lib/passcode'
 
 // Only failures count. Per-IP limits are generous because many Bangladeshi
 // mobile users share one carrier IP; the per-device and per-site caps stop
@@ -14,6 +17,18 @@ const PER_IP = { limit: 30, windowS: 10 * 60 }
 const PER_DEVICE = { limit: 8, windowS: 10 * 60 }
 const PER_SITE = { limit: 300, windowS: 60 * 60 }
 const DEVICE_COOKIE = 'shb_dev'
+
+/** The guest list whose own passcode this is, or null. */
+function listWithPasscode(lists = [], attempt) {
+  const given = Buffer.from(normalizePasscode(attempt))
+  return (
+    lists.find((l) => {
+      if (!l?.passcode) return false
+      const expected = Buffer.from(normalizePasscode(l.passcode))
+      return given.length === expected.length && timingSafeEqual(given, expected)
+    }) || null
+  )
+}
 
 export async function POST(req, { params }) {
   const crossOrigin = await assertSameOrigin()
@@ -45,11 +60,20 @@ export async function POST(req, { params }) {
   const body = await req.json().catch(() => ({}))
   const name = typeof body.name === 'string' ? body.name.replace(/\s+/g, ' ').trim().slice(0, 60) : ''
 
-  if (!access.passcode_enc || !passcodeMatches(body.passcode, access.passcode_enc)) {
-    for (const [key, limit] of Object.values(keys)) await rateLimitHit(key, limit)
-    return NextResponse.json({ error: 'That passcode didn’t work. Check your invitation and try again.' }, { status: 401 })
+  // The site passcode opens everything (or, typed on a guest list's page, that list);
+  // a guest list's own passcode opens only that list's events.
+  const { invitation } = await getSiteContent(site.id)
+  let list = null
+  if (access.passcode_enc && passcodeMatches(body.passcode, access.passcode_enc)) {
+    list = guestListFor(invitation, body.list)
+  } else {
+    list = listWithPasscode(invitation.guestLists, body.passcode)
+    if (!list) {
+      for (const [key, limit] of Object.values(keys)) await rateLimitHit(key, limit)
+      return NextResponse.json({ error: 'That passcode didn’t work. Check your invitation and try again.' }, { status: 401 })
+    }
   }
 
-  await setGuestSession({ siteId: site.id, passcodeVersion: access.passcode_version, name })
+  await setGuestSession({ siteId: site.id, passcodeVersion: access.passcode_version, name, list: list?.id || null })
   return NextResponse.json({ success: true })
 }

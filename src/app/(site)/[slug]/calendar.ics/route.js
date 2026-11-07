@@ -2,9 +2,9 @@ import { getSiteContent } from '@/lib/server/site-data'
 import { getSiteForRequest } from '@/lib/server/site-view'
 import { siteOrigin } from '@/lib/server/site-access'
 import { buildIcs } from '@/lib/calendar'
-import { inviteEvents } from '@/lib/invitation'
+import { ceremoniesForList, guestListFor, inviteEvents } from '@/lib/invitation'
 
-/** The invitation's events as a calendar file (?event=<id> for just one). */
+/** The invitation's events as a calendar file (?event=<id> for just one, ?list=<id> for a guest list's). */
 export async function GET(req, { params }) {
   const { slug } = await params
   const found = await getSiteForRequest(slug)
@@ -12,10 +12,13 @@ export async function GET(req, { params }) {
   if (!found.canView('invite')) return new Response('Passcode required', { status: 401 })
 
   const { site } = found
-  const { content, ceremonies } = await getSiteContent(site.id)
+  const { content, ceremonies, invitation } = await getSiteContent(site.id)
   const names = content?.hero?.coupleNames?.en || site.owner_name || ''
-  const only = new URL(req.url).searchParams.get('event')
-  const events = inviteEvents(ceremonies)
+  const query = new URL(req.url).searchParams
+  const only = query.get('event')
+  // Guests on a guest list only get their own events
+  const list = guestListFor(invitation, query.get('list')) || (found.viewer.canPreview ? null : guestListFor(invitation, found.guest?.list))
+  const events = inviteEvents(ceremoniesForList(ceremonies, list))
     .filter((c) => c.startsAt && (!only || c.id === only))
     .map((c) => ({
       id: `${c.id}.${site.id}`,

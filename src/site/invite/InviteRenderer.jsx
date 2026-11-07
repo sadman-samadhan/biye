@@ -48,7 +48,7 @@ export default function InviteRenderer({ site, content, theme, tradition, palett
     venue: cer.venue,
     banner: photo(cer.heroImage, cer.heroImagePosition),
     liveStreamUrl: has(cer.liveStreamUrl) ? cer.liveStreamUrl : null,
-    icsUrl: cer.startsAt && !demo ? `/${site.slug}/calendar.ics?event=${encodeURIComponent(cer.id)}` : null,
+    icsUrl: cer.startsAt && !demo ? `/${site.slug}/calendar.ics?event=${encodeURIComponent(cer.id)}${listId ? `&list=${listId}` : ''}` : null,
     googleUrl: googleCalendarUrl({
       title: [cer.title?.en, nameLine].filter(Boolean).join(' · '),
       startsAt: cer.startsAt,

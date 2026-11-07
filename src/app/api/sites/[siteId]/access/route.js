@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { assertSameOrigin, authorizeSite } from '@/lib/server/auth'
 import { serviceClient } from '@/lib/server/supabase'
-import { getSiteById, writeAudit } from '@/lib/server/site-data'
+import { getSiteById, getSiteContent, writeAudit } from '@/lib/server/site-data'
 import { describeAccess, ensureSiteAccess, siteOrigin } from '@/lib/server/site-access'
 
 const patchSchema = z
@@ -21,7 +21,8 @@ export async function GET(req, { params }) {
   const site = await getSiteById(siteId)
   if (!site) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   const row = await ensureSiteAccess(siteId)
-  return NextResponse.json(describeAccess(row, site, siteOrigin(req)), { headers: { 'Cache-Control': 'private, no-store' } })
+  const { invitation } = await getSiteContent(siteId)
+  return NextResponse.json(describeAccess(row, site, siteOrigin(req), invitation.guestLists || []), { headers: { 'Cache-Control': 'private, no-store' } })
 }
 
 export async function PATCH(req, { params }) {

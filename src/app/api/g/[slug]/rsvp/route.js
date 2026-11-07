@@ -12,13 +12,14 @@ const PER_DEVICE = { limit: 10, windowS: 10 * 60 }
 const PER_SITE = { limit: 400, windowS: 60 * 60 }
 const NO_STORE = { 'Cache-Control': 'private, no-store' }
 
-/** listId: the guest list the reply comes from; guests can only reply to that list's events. */
+/** listId: the guest list the reply comes from; guests on a list can only reply to its events. */
 async function load(slug, listId) {
   const found = await getSiteForRequest(slug)
   if (!found) return { error: NextResponse.json({ error: 'Not found' }, { status: 404 }) }
   if (!found.canView('invite')) return { error: NextResponse.json({ error: 'Passcode required' }, { status: 401 }) }
   const { invitation, ceremonies } = await getSiteContent(found.site.id)
-  const list = listId ? guestListFor(invitation, listId) : null
+  // The list in the link, else the one this guest signed in through
+  const list = guestListFor(invitation, listId) || (found.viewer.canPreview ? null : guestListFor(invitation, found.guest?.list))
   return { found, state: rsvpState(invitation, ceremoniesForList(ceremonies, list)) }
 }
 

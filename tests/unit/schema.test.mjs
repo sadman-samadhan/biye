@@ -70,3 +70,12 @@ test('invitation guest lists are validated', async () => {
   assert.equal(schema.safeParse({ guestLists: [{ id: 'abcDEF234567', name: '  ', events: ['akht'] }] }).success, false)
   assert.equal(schema.safeParse({ guestLists: [{ id: 'bad/id', name: 'Family', events: ['akht'] }] }).success, false)
 })
+
+test('guest list passcodes must be valid and different', async () => {
+  const { sectionSchemas } = await import('../../lib/content/schema.js')
+  const schema = sectionSchemas.invitation
+  const list = (id, passcode) => ({ id, name: 'List', events: ['akht'], passcode })
+  assert.equal(schema.safeParse({ guestLists: [list('abcDEF234567', 'bokul-4821'), list('xyzDEF234567', 'joba-1234')] }).success, true)
+  assert.equal(schema.safeParse({ guestLists: [list('abcDEF234567', 'bokul-4821'), list('xyzDEF234567', 'BOKUL-4821')] }).success, false)
+  assert.equal(schema.safeParse({ guestLists: [list('abcDEF234567', 'abc')] }).success, false)
+})

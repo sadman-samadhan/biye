@@ -8,7 +8,7 @@ import { Lock } from 'lucide-react'
  * Shown instead of a private wedding page until the guest enters the passcode
  * from their invitation. Uses the site's palette variables so it matches the site.
  */
-export default function PasscodeGate({ slug, coupleNames, date }) {
+export default function PasscodeGate({ slug, listId = null, coupleNames, date }) {
   const router = useRouter()
   const [passcode, setPasscode] = useState('')
   const [name, setName] = useState('')
@@ -23,7 +23,7 @@ export default function PasscodeGate({ slug, coupleNames, date }) {
       const res = await fetch(`/api/g/${encodeURIComponent(slug)}/unlock`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ passcode, name }),
+        body: JSON.stringify({ passcode, name, list: listId }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
