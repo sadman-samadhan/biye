@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import PasswordInput from '@/components/PasswordInput'
 
 export default function SetPasswordForm() {
   const router = useRouter()
@@ -44,14 +45,14 @@ export default function SetPasswordForm() {
         <label htmlFor="new-password" className="mb-1.5 block text-sm font-medium">
           New password
         </label>
-        <input id="new-password" type="password" autoComplete="new-password" minLength={10} required value={password} onChange={(e) => setPassword(e.target.value)} className={field} />
+        <PasswordInput id="new-password" autoComplete="new-password" minLength={10} required value={password} onChange={(e) => setPassword(e.target.value)} className={field} />
         <p className="mt-1 text-xs text-[#6B625A]">At least 10 characters.</p>
       </div>
       <div>
         <label htmlFor="confirm-password" className="mb-1.5 block text-sm font-medium">
           Type it again
         </label>
-        <input id="confirm-password" type="password" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} className={field} aria-invalid={mismatch} />
+        <PasswordInput id="confirm-password" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} className={field} aria-invalid={mismatch} />
       </div>
       {error && (
         <p role="alert" className="text-sm text-[#A8323A]">

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import PasswordInput from '@/components/PasswordInput'
 
 export default function LoginForm({ next }) {
   const router = useRouter()
@@ -57,9 +58,8 @@ export default function LoginForm({ next }) {
         <label htmlFor="login-password" className="mb-1.5 block text-sm font-medium">
           Password
         </label>
-        <input
+        <PasswordInput
           id="login-password"
-          type="password"
           autoComplete="current-password"
           required
           value={password}
