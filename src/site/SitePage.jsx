@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation'
-import QRCode from 'qrcode'
 import { getSiteContent } from '@/lib/server/site-data'
 import { getSiteForRequest } from '@/lib/server/site-view'
 import { pageOrigin } from '@/lib/server/site-access'
+import { ceremoniesForList, guestListFor } from '@/lib/invitation'
 import { resolveContentMedia } from '@/lib/server/media/resolve'
 import { getTheme, THEMES } from '@/themes/registry'
 import { getTradition } from '@/traditions'
@@ -17,8 +17,9 @@ import PasscodeGate from '@/components/PasscodeGate'
  *   view 'auto'     — follows the phase: invitation → live → memories
  *   view 'invite'   — always the invitation
  *   view 'memories' — always the full site (once published, or for the couple)
+ * listId: a guest list (/{slug}/i/{id}); the invitation then shows only that list's events.
  */
-export default async function SitePage({ slug, query = {}, view = 'auto' }) {
+export default async function SitePage({ slug, query = {}, view = 'auto', listId = null }) {
   const found = await getSiteForRequest(slug)
   if (!found) notFound()
   const { site, status, viewer, guest, phase, canView, publicOnlyMedia } = found
@@ -48,7 +49,11 @@ export default async function SitePage({ slug, query = {}, view = 'auto' }) {
     )
   }
 
-  const content = await resolveContentMedia(site.id, await getSiteContent(site.id), { publicOnly: publicOnlyMedia })
+  const stored = await getSiteContent(site.id)
+  // A deleted list's link falls back to the couple's main link
+  const list = listId ? guestListFor(stored.invitation, listId) : null
+  if (listId && !list) redirect(`/${site.slug}`)
+  const content = await resolveContentMedia(site.id, stored, { publicOnly: publicOnlyMedia })
   const tradition = getTradition(site.wedding_type || content.content?.wedding_type, site.tradition_variant)
 
   const banner = viewer.canPreview ? (
@@ -70,8 +75,6 @@ export default async function SitePage({ slug, query = {}, view = 'auto' }) {
   if (shown === 'memories') return <SiteRenderer {...common} />
 
   const origin = await pageOrigin()
-  const qr = await QRCode.toString(`${origin}/${site.slug}`, { type: 'svg', margin: 1, errorCorrectionLevel: 'M' })
-    .then((svg) => `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`)
-    .catch(() => null)
-  return <InviteRenderer {...common} mode={shown === 'live' ? 'live' : 'invite'} origin={origin} qr={qr} />
+  const invite = list ? { ...common, content: { ...content, ceremonies: ceremoniesForList(content.ceremonies, list) } } : common
+  return <InviteRenderer {...invite} mode={shown === 'live' ? 'live' : 'invite'} origin={origin} listId={list?.id || null} />
 }

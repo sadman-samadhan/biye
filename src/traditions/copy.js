@@ -79,12 +79,6 @@ export const BASE_COPY = {
   'invite.rsvp.thanks': { en: 'Thank you! Your reply has reached the couple.', bn: 'ধন্যবাদ! আপনার উত্তর পৌঁছেছে।' },
   'invite.rsvp.yours': { en: 'You can change your reply until replies close.', bn: 'সময় শেষ হওয়ার আগে উত্তর বদলাতে পারবেন।' },
   'invite.rsvp.closed': { en: 'Replies are now closed.', bn: 'উত্তর দেওয়ার সময় শেষ।' },
-  'invite.share.title': { en: 'Share the invitation', bn: 'আমন্ত্রণ শেয়ার করুন' },
-  'invite.share.whatsapp': { en: 'WhatsApp', bn: 'হোয়াটসঅ্যাপ' },
-  'invite.share.copy': { en: 'Copy link', bn: 'লিংক কপি করুন' },
-  'invite.share.copied': { en: 'Link copied', bn: 'লিংক কপি হয়েছে' },
-  'invite.share.ics': { en: 'All events (.ics)', bn: 'সব অনুষ্ঠান (.ics)' },
-  'invite.share.qr': { en: 'Scan to open on another phone', bn: 'অন্য ফোনে খুলতে স্ক্যান করুন' },
 }
 
 /**

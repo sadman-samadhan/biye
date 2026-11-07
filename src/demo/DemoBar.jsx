@@ -8,7 +8,7 @@ const on = 'border-[#1E1A17] bg-[#1E1A17] text-white'
 const off = 'border-[#D9CDBB] hover:bg-[#F4ECDF]'
 
 /** Floating bar on demo pages: what you are looking at, and every other combination. */
-export default function DemoBar({ themeId, traditionId, view }) {
+export default function DemoBar({ themeId, traditionId, view, lists = [], listId = null }) {
   const theme = THEME_LIST.find((t) => t.id === themeId)
   const tradition = TRADITIONS[traditionId]
   const href = (t, tr, v = view) => `/demo/${t}/${tr}${v === 'invite' ? '/invite' : ''}`
@@ -19,6 +19,7 @@ export default function DemoBar({ themeId, traditionId, view }) {
           <span className="rounded bg-[#F4ECDF] px-1.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-[#B05A10]">Demo</span>
           <span className="min-w-0 flex-1 truncate font-medium">
             {theme?.name.en} · {tradition?.label?.en}
+            {listId && ` · ${lists.find((l) => l.id === listId)?.name || ''}`}
           </span>
           <span className="flex overflow-hidden rounded-md border border-[#E8DFD2]">
             <Link href={href(themeId, traditionId, 'invite')} className={`px-2 py-1 ${view === 'invite' ? 'bg-[#1E1A17] text-white' : 'hover:bg-[#F4ECDF]'}`}>
@@ -33,6 +34,21 @@ export default function DemoBar({ themeId, traditionId, view }) {
           </span>
         </summary>
         <div className="space-y-3 border-t border-[#E8DFD2] px-4 py-3">
+          {lists.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-[12px] text-[#6B625A]">Each group of guests gets its own link with only their events:</p>
+              <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Guest lists">
+                <Link href={href(themeId, traditionId, 'invite')} className={`${chip} ${!listId ? on : off}`}>
+                  All events
+                </Link>
+                {lists.map((l) => (
+                  <Link key={l.id} href={`${href(themeId, traditionId, 'invite')}/${l.id}`} className={`${chip} ${l.id === listId ? on : off}`}>
+                    {l.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Themes">
             {THEME_LIST.map((t) => (
               <Link key={t.id} href={href(t.id, traditionId)} className={`${chip} ${t.id === themeId ? on : off}`}>

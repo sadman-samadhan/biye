@@ -6,24 +6,26 @@ import { assertSameOrigin } from '@/lib/server/auth'
 import { clientKey, rateLimitHit } from '@/lib/server/rate-limit'
 import { getOwnRsvp, saveRsvp, toGuestRsvp } from '@/lib/server/rsvp'
 import { rsvpInputSchema } from '@/lib/content/schema'
-import { rsvpState } from '@/lib/invitation'
+import { ceremoniesForList, guestListFor, rsvpState } from '@/lib/invitation'
 
 const PER_DEVICE = { limit: 10, windowS: 10 * 60 }
 const PER_SITE = { limit: 400, windowS: 60 * 60 }
 const NO_STORE = { 'Cache-Control': 'private, no-store' }
 
-async function load(slug) {
+/** listId: the guest list the reply comes from; guests can only reply to that list's events. */
+async function load(slug, listId) {
   const found = await getSiteForRequest(slug)
   if (!found) return { error: NextResponse.json({ error: 'Not found' }, { status: 404 }) }
   if (!found.canView('invite')) return { error: NextResponse.json({ error: 'Passcode required' }, { status: 401 }) }
   const { invitation, ceremonies } = await getSiteContent(found.site.id)
-  return { found, state: rsvpState(invitation, ceremonies) }
+  const list = listId ? guestListFor(invitation, listId) : null
+  return { found, state: rsvpState(invitation, ceremoniesForList(ceremonies, list)) }
 }
 
 /** This browser's own reply (to prefill the form). */
 export async function GET(req, { params }) {
   const { slug } = await params
-  const { found, state, error } = await load(slug)
+  const { found, state, error } = await load(slug, new URL(req.url).searchParams.get('list'))
   if (error) return error
   const own = isSupabaseConfigured() ? await getOwnRsvp(found.site.id) : null
   return NextResponse.json({ open: state.open, rsvp: toGuestRsvp(own) }, { headers: NO_STORE })
@@ -33,7 +35,13 @@ export async function POST(req, { params }) {
   const crossOrigin = await assertSameOrigin()
   if (crossOrigin) return crossOrigin
   const { slug } = await params
-  const { found, state, error } = await load(slug)
+  const parsed = rsvpInputSchema.safeParse(await req.json().catch(() => null))
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0]
+    return NextResponse.json({ error: issue?.message || 'Invalid reply', field: issue?.path?.[0] }, { status: 400 })
+  }
+  const input = parsed.data
+  const { found, state, error } = await load(slug, input.list)
   if (error) return error
   const { site } = found
   // Guests may only reply to live sites (the couple previewing a draft can test the form)
@@ -42,12 +50,6 @@ export async function POST(req, { params }) {
     return NextResponse.json({ error: state.reason === 'closed' ? 'Replies are closed.' : 'This invitation is not taking replies.' }, { status: 409 })
   }
 
-  const parsed = rsvpInputSchema.safeParse(await req.json().catch(() => null))
-  if (!parsed.success) {
-    const issue = parsed.error.issues[0]
-    return NextResponse.json({ error: issue?.message || 'Invalid reply', field: issue?.path?.[0] }, { status: 400 })
-  }
-  const input = parsed.data
   if (input.website) return NextResponse.json({ success: true }) // honeypot
 
   const allowed = new Set(state.events.map((e) => e.id))

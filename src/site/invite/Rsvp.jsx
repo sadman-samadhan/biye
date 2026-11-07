@@ -26,7 +26,7 @@ function Label({ htmlFor, text, children }) {
 const EMPTY = { name: '', phone: '', side: '', attending: null, partySize: 1, events: [], note: '', website: '' }
 
 /** Reply card. Remembers this phone's reply (signed cookie) so guests can change it until replies close. */
-export default function Rsvp({ slug, open, events = [], settings, deadline, copy, demo = false }) {
+export default function Rsvp({ slug, listId = null, open, events = [], settings, deadline, copy, demo = false }) {
   const id = useId()
   const [form, setForm] = useState({ ...EMPTY, events: events.map((e) => e.id) })
   const [saved, setSaved] = useState(null)
@@ -37,7 +37,7 @@ export default function Rsvp({ slug, open, events = [], settings, deadline, copy
   useEffect(() => {
     if (demo) return
     let cancelled = false
-    fetch(`/api/g/${encodeURIComponent(slug)}/rsvp`, { cache: 'no-store' })
+    fetch(`/api/g/${encodeURIComponent(slug)}/rsvp${listId ? `?list=${encodeURIComponent(listId)}` : ''}`, { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (cancelled || !data?.rsvp) return
@@ -49,7 +49,7 @@ export default function Rsvp({ slug, open, events = [], settings, deadline, copy
     return () => {
       cancelled = true
     }
-  }, [slug, demo])
+  }, [slug, listId, demo])
 
   const set = (patch) => setForm((f) => ({ ...f, ...patch }))
   const toggleEvent = (eventId) => set({ events: form.events.includes(eventId) ? form.events.filter((e) => e !== eventId) : [...form.events, eventId] })
@@ -70,7 +70,7 @@ export default function Rsvp({ slug, open, events = [], settings, deadline, copy
       const res = await fetch(`/api/g/${encodeURIComponent(slug)}/rsvp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, side: form.side || null, partySize: Number(form.partySize) }),
+        body: JSON.stringify({ ...form, side: form.side || null, partySize: Number(form.partySize), list: listId }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok) throw new Error(data.error || 'Could not send your reply. Please try again.')

@@ -61,3 +61,12 @@ test('slugify and slug rules', () => {
   assert.ok(slugProblem('-bad-'))
   assert.ok(slugProblem('has_underscore'))
 })
+
+test('invitation guest lists are validated', async () => {
+  const { sectionSchemas } = await import('../../lib/content/schema.js')
+  const schema = sectionSchemas.invitation
+  assert.equal(schema.safeParse({ guestLists: [{ id: 'abcDEF234567', name: 'Family', events: ['akht'] }] }).success, true)
+  assert.equal(schema.safeParse({ guestLists: [{ id: 'abcDEF234567', name: 'Family', events: [] }] }).success, false)
+  assert.equal(schema.safeParse({ guestLists: [{ id: 'abcDEF234567', name: '  ', events: ['akht'] }] }).success, false)
+  assert.equal(schema.safeParse({ guestLists: [{ id: 'bad/id', name: 'Family', events: ['akht'] }] }).success, false)
+})

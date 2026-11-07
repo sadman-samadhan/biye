@@ -133,7 +133,26 @@ export function demoSite(themeId, traditionId, now = new Date()) {
       signedBy: { en: 'The Rahman and Chowdhury families', bn: 'রহমান ও চৌধুরী পরিবার' },
       photos: picks.story.map((id) => ({ url: photo(id) })),
       rsvp: { enabled: true, deadline, maxParty: 6, collectPhone: false },
+      guestLists: demoGuestLists(ceremonies, anchor),
     },
   }
   return { site, content, theme, tradition }
+}
+
+/** Ids of the sample guest lists every demo has (see demoGuestLists). */
+export const DEMO_LISTS = ['demo-first-event', 'demo-main-events']
+
+/**
+ * Two sample guest lists, to show that each group of guests can be invited to
+ * different events: the first event only, and the main ceremony with the last event.
+ */
+function demoGuestLists(ceremonies, anchor) {
+  const title = (c) => c?.title?.en || c?.labelEn || c?.id
+  const first = ceremonies[0]
+  const last = ceremonies[ceremonies.length - 1]
+  const main = [...new Set([anchor?.id, last?.id].filter(Boolean))]
+  return [
+    { id: DEMO_LISTS[0], name: `${title(first)} only`, events: [first?.id].filter(Boolean) },
+    { id: DEMO_LISTS[1], name: main.map((id) => title(ceremonies.find((c) => c.id === id))).join(' & '), events: main },
+  ]
 }

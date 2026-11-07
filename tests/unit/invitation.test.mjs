@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { banglaDate, buildIcs, dateExtraLine, googleCalendarUrl, hijriDate } from '../../lib/calendar.js'
-import { countdownEvent, headlineEvent, inviteEvents, isLiveStreamUrl, isMapUrl, rsvpEvents, rsvpState, todaysEvents } from '../../lib/invitation.js'
+import { GUEST_LIST_ID, ceremoniesForList, countdownEvent, guestListFor, headlineEvent, inviteEvents, isLiveStreamUrl, isMapUrl, newGuestListId, rsvpEvents, rsvpState, todaysEvents } from '../../lib/invitation.js'
 import { rsvpInputSchema, validateSection } from '../../lib/content/schema.js'
 
 const at = (iso) => new Date(iso)
@@ -99,4 +99,31 @@ test('invitation and RSVP input validation', () => {
   assert.equal(rsvpInputSchema.safeParse({ name: ' ', attending: true, partySize: 3, events: [] }).success, false)
   assert.equal(rsvpInputSchema.safeParse({ name: 'x', attending: true, partySize: 3, events: [], admin: true }).success, false)
   assert.equal(rsvpInputSchema.safeParse({ name: 'x', attending: true, partySize: 3, events: [], phone: '=cmd()' }).success, false)
+})
+
+test('guest lists show only their events', () => {
+  const ceremonies = [
+    { id: 'holud', startsAt: '2026-12-10T12:00:00Z' },
+    { id: 'akht', startsAt: '2026-12-12T12:00:00Z' },
+    { id: 'walima', startsAt: '2026-12-14T12:00:00Z' },
+  ]
+  const invitation = { rsvp: { enabled: true }, guestLists: [{ id: 'abcDEF234567', name: 'Holud only', events: ['holud'] }] }
+
+  const list = guestListFor(invitation, 'abcDEF234567')
+  assert.equal(list.name, 'Holud only')
+  assert.equal(guestListFor(invitation, 'unknown-list-id'), null)
+  assert.equal(guestListFor(invitation, '../etc'), null)
+  assert.equal(guestListFor(invitation, null), null)
+
+  assert.deepEqual(ceremoniesForList(ceremonies, list).map((c) => c.id), ['holud'])
+  assert.equal(ceremoniesForList(ceremonies, null).length, 3)
+  // RSVP choices follow the list
+  const state = rsvpState(invitation, ceremoniesForList(ceremonies, list), at('2026-12-01T00:00:00Z'))
+  assert.deepEqual(state.events.map((c) => c.id), ['holud'])
+  // Replies close after the list's last event, not the wedding's
+  assert.equal(rsvpState(invitation, ceremoniesForList(ceremonies, list), at('2026-12-11T00:00:00Z')).open, false)
+
+  const id = newGuestListId()
+  assert.match(id, GUEST_LIST_ID)
+  assert.notEqual(id, newGuestListId())
 })

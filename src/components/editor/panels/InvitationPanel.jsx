@@ -6,6 +6,7 @@ import { inviteEvents } from '@/lib/invitation'
 import CeremonyCarouselPicker from '@/components/admin/CeremonyCarouselPicker'
 import PanelFrame from '../PanelFrame'
 import MediaField from '../MediaField'
+import GuestListsSection from './GuestListsSection'
 import { usePanelDraft } from '../usePanelDraft'
 import { useMediaUrls } from '../media-context'
 
@@ -26,6 +27,7 @@ function initial(invitation = {}) {
     photos: invitation.photos || [],
     countdownTo: invitation.countdownTo || '',
     shareCardPhoto: Boolean(invitation.shareCardPhoto),
+    guestLists: invitation.guestLists || [],
     rsvp: { enabled: false, deadline: '', maxParty: 5, collectPhone: false, note: { ...EMPTY }, ...(invitation.rsvp || {}) },
   }
 }
@@ -73,6 +75,7 @@ export default function InvitationPanel({ data, saveContent, upload, onDirtyChan
       countdownTo: draft.countdownTo || null,
       cover: draft.cover || null,
       rsvp: { ...rsvp, maxParty: Number(rsvp.maxParty) || 5 },
+      guestLists: draft.guestLists.map((l) => ({ ...l, name: l.name.trim() })),
     }
     const saved = await saveContent('invitation', value)
     commit(initial(saved))
@@ -148,6 +151,15 @@ export default function InvitationPanel({ data, saveContent, upload, onDirtyChan
         />
         {events.length === 0 && <p className="text-xs text-sb-muted">Add start times in Ceremonies to show a countdown and calendar buttons.</p>}
       </section>
+
+      <GuestListsSection
+        lists={draft.guestLists}
+        onChange={(guestLists) => update({ guestLists })}
+        events={inviteEvents(data.ceremonies || [])}
+        savedLists={data.invitation?.guestLists || []}
+        siteId={data.site.id}
+        slug={data.site.slug}
+      />
 
       <section className="space-y-4 rounded-xl border border-sb-line p-4">
         <Switch label="Ask guests to RSVP" description="Guests reply on the invitation; you see the replies under RSVPs." checked={Boolean(rsvp.enabled)} onChange={(enabled) => setRsvp({ enabled })} />

@@ -12,14 +12,13 @@ import Hosts from './Hosts'
 import Countdown from './Countdown'
 import Events from './Events'
 import Rsvp from './Rsvp'
-import Share from './Share'
 import LiveToday from './LiveToday'
 import Closing from './Closing'
 import OpeningGate from '@/themes/openings/OpeningGate'
 import { THEME_FRAMES } from '@/themes/variants'
 import { ceremonyWhen, formatEventDay } from '@/lib/dates'
 import { dateExtraLine, googleCalendarUrl } from '@/lib/calendar'
-import { countdownEvent, headlineEvent, inviteEvents, rsvpState, shareText, todaysEvents } from '@/lib/invitation'
+import { countdownEvent, headlineEvent, inviteEvents, rsvpState, todaysEvents } from '@/lib/invitation'
 import { isAnchorCeremony } from '@/traditions'
 
 /**
@@ -27,7 +26,7 @@ import { isAnchorCeremony } from '@/traditions'
  * Same theme as the full site; wording comes from the tradition and the
  * couple's invitation settings.
  */
-export default function InviteRenderer({ site, content, theme, tradition, paletteId, viewerName, banner, mode = 'invite', origin = '', qr = null, now = new Date(), demo = false }) {
+export default function InviteRenderer({ site, content, theme, tradition, paletteId, viewerName, banner, mode = 'invite', origin = '', listId = null, now = new Date(), demo = false }) {
   const copy = resolveCopy(tradition, content.content?.copy || {})
   const c = content.content || {}
   const hero = c.hero || {}
@@ -55,7 +54,7 @@ export default function InviteRenderer({ site, content, theme, tradition, palett
       startsAt: cer.startsAt,
       endsAt: cer.endsAt,
       location: [cer.venue?.en, cer.venue?.address?.en].filter(Boolean).join(', '),
-      details: origin ? `${origin}/${site.slug}` : '',
+      details: origin ? `${origin}/${site.slug}${listId ? `/i/${listId}` : ''}` : '',
     }),
   })
   const events = inviteEvents(ceremonies).map(toEvent)
@@ -63,7 +62,9 @@ export default function InviteRenderer({ site, content, theme, tradition, palett
 
   const main = countdownEvent(invitation, ceremonies, now, isAnchorCeremony)
   const headline = headlineEvent(invitation, ceremonies, now, isAnchorCeremony)
-  const date = hero.date?.en || hero.date?.bn ? hero.date : formatEventDay(headline?.startsAt)
+  // A guest list's invitation headlines its own events, not the wedding day it may not include
+  const ownDate = hero.date?.en || hero.date?.bn ? hero.date : null
+  const date = (listId && formatEventDay(headline?.startsAt)) || ownDate || formatEventDay(headline?.startsAt)
   const verse = invitation.showVerse === false ? null : verseFrom(invitation.verse || c.blessing || hero.blessing || tradition.defaultBlessing)
 
   const rsvp = rsvpState(invitation, ceremonies, now)
@@ -75,7 +76,6 @@ export default function InviteRenderer({ site, content, theme, tradition, palett
     .filter((p) => has(p.src))
     .map((p, i) => ({ id: `p${i}`, src: p.src, category: 'wedding', alt: `${nameLine} ${i + 1}` }))
 
-  const url = `${origin}/${site.slug}`
   const navItems = [
     ...(today.length ? [{ id: 'today', label: copy['invite.today'] }] : []),
     ...(events.length ? [{ id: 'events', label: copy['invite.events.title'] }] : []),
@@ -123,6 +123,7 @@ export default function InviteRenderer({ site, content, theme, tradition, palett
           {showRsvp && (
             <Rsvp
               slug={site.slug}
+              listId={listId}
               open={rsvp.open}
               events={rsvp.events.map((e) => ({ id: e.id, title: e.title }))}
               settings={{ maxParty: rsvp.settings.maxParty, collectPhone: rsvp.settings.collectPhone, note: rsvp.settings.note }}
@@ -133,7 +134,6 @@ export default function InviteRenderer({ site, content, theme, tradition, palett
           )}
           <Gallery variant={v.gallery} items={photos} albums={[]} copy={{ ...copy, 'gallery.title': copy['invite.photos.title'] }} viewerName={viewerName} mask={theme.shape.photoMask} />
           {live && on('messages') && <Guestbook slug={site.slug} copy={copy} />}
-          <Share url={url} text={shareText({ names, date, url })} icsUrl={events.some((e) => e.startsAt) && !demo ? `/${site.slug}/calendar.ics` : null} qr={qr} copy={copy} />
           <Closing
             closing={invitation.closing?.en || invitation.closing?.bn ? invitation.closing : copy['invite.closing']}
             signedBy={invitation.signedBy}
