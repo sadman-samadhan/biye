@@ -22,11 +22,7 @@ const data = [
   {
     "arabic": "اللَّهُمَّ بَارِكْ لَهُمَا وَبَارِكْ عَلَيْهِمَا وَاجْمَعْ بَيْنَهُمَا فِي خَيْرٍ",
     "english": "O Allah, bless them, shower blessings upon them, and unite them in goodness.",
-    "bengali": "হে আল্লাহ, তাদের বরকত দিন, তাদের উপর রহমত বর্ষণ করুন এবং তাদের মাঝে কল্যাণের মিলন ঘটান।",
-    "reference": {
-      "en": "Traditional Wedding Blessing",
-      "bn": "বিবাহের দোআ"
-    }
+    "bengali": "হে আল্লাহ, তাদের বরকত দিন, তাদের উপর রহমত বর্ষণ করুন এবং তাদের মাঝে কল্যাণের মিলন ঘটান।"
   }
 ]
 

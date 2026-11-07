@@ -6,7 +6,7 @@ import { themeCards, traditionList } from './data'
 import { MARKETING, MOODS, PRICES, whatsappUrl } from '@/i18n/marketing'
 
 // The three phones in the hero, front one last
-const HERO_PHONES = ['noor', 'patrika', 'laal-paar']
+const HERO_PHONES = ['noor', 'laal-paar', 'jharokha']
 
 function Phone({ id, className = '' }) {
   return (
