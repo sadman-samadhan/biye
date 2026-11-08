@@ -1,4 +1,5 @@
 import LegalPage from '@/marketing/LegalPage'
+import { WHATSAPP_DISPLAY } from '@/i18n/marketing'
 
 export const metadata = { title: 'Privacy | ShubhoBiye' }
 
@@ -52,7 +53,7 @@ const SECTIONS = [
   {
     title: 'Your choices',
     body: [
-      'Couples can see, change, download and delete their content from their dashboard, or ask us to do it. Guests who want a reply or message removed can ask the couple, or contact us on WhatsApp at +880 1954 638110.',
+      `Couples can see, change, download and delete their content from their dashboard, or ask us to do it. Guests who want a reply or message removed can ask the couple, or contact us on WhatsApp at ${WHATSAPP_DISPLAY}.`,
     ],
   },
 ]

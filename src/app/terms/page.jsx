@@ -1,4 +1,5 @@
 import LegalPage from '@/marketing/LegalPage'
+import { WHATSAPP_DISPLAY } from '@/i18n/marketing'
 
 export const metadata = { title: 'Terms | ShubhoBiye' }
 
@@ -43,7 +44,7 @@ const SECTIONS = [
   },
   {
     title: 'Contact',
-    body: ['Questions or complaints: WhatsApp +880 1954 638110. These terms are governed by the laws of Bangladesh.'],
+    body: [`Questions or complaints: WhatsApp ${WHATSAPP_DISPLAY}. These terms are governed by the laws of Bangladesh.`],
   },
 ]
 

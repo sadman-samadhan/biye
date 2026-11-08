@@ -4,6 +4,8 @@
  */
 
 export const WHATSAPP_NUMBER = '8801353630697'
+/** The same number written for people: +880 1353 630697 */
+export const WHATSAPP_DISPLAY = `+${WHATSAPP_NUMBER.slice(0, 3)} ${WHATSAPP_NUMBER.slice(3, 7)} ${WHATSAPP_NUMBER.slice(7)}`
 
 export const PRICES = { invite: '৳999', memories: '৳1,499', complete: '৳1,999' }
 
