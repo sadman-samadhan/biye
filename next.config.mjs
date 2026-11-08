@@ -10,10 +10,7 @@ const nextConfig = {
   serverExternalPackages: ['@napi-rs/canvas', 'sharp'],
   // Bundled OFL fonts for server-side rendering (monograms, share cards)
   outputFileTracingIncludes: {
-    // sharp's libvips is loaded by the OS linker, not require(), so the tracer misses it on Linux
-    '/api/sites/[siteId]/uploads/[mediaId]/complete': ['./node_modules/@img/sharp-libvips-linux-x64/**'],
-    '/api/sites/[siteId]/media/rebuild': ['./node_modules/@img/sharp-libvips-linux-x64/**'],
-    '/api/sites/[siteId]/monogram': ['./assets/fonts/**', './node_modules/@img/sharp-libvips-linux-x64/**'],
+    '/api/sites/[siteId]/monogram': ['./assets/fonts/**'],
     '/[slug]/og.jpg': ['./assets/fonts/**'],
   },
   images: {
