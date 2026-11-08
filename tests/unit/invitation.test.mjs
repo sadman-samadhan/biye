@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { banglaDate, buildIcs, dateExtraLine, googleCalendarUrl, hijriDate } from '../../lib/calendar.js'
-import { GUEST_LIST_ID, ceremoniesForList, countdownEvent, guestListFor, headlineEvent, inviteEvents, isLiveStreamUrl, isMapUrl, newGuestListId, rsvpEvents, rsvpState, todaysEvents } from '../../lib/invitation.js'
+import { GUEST_LIST_ID, ceremoniesForList, contentForList, countdownEvent, guestListFor, headlineEvent, inviteEvents, isLiveStreamUrl, isMapUrl, newGuestListId, rsvpEvents, rsvpState, todaysEvents } from '../../lib/invitation.js'
 import { rsvpInputSchema, validateSection } from '../../lib/content/schema.js'
 
 const at = (iso) => new Date(iso)
@@ -126,4 +126,15 @@ test('guest lists show only their events', () => {
   const id = newGuestListId()
   assert.match(id, GUEST_LIST_ID)
   assert.notEqual(id, newGuestListId())
+})
+
+test('the photos site for a guest list shows only its events and albums', () => {
+  const content = {
+    ceremonies: [{ id: 'holud' }, { id: 'akht' }],
+    gallery: [{ filename: 'a', category: 'holud' }, { filename: 'b', category: 'akht' }, { filename: 'c', category: 'wedding' }, { filename: 'd' }],
+  }
+  const seen = contentForList(content, { id: 'x', events: ['holud'] })
+  assert.deepEqual(seen.ceremonies.map((c) => c.id), ['holud'])
+  assert.deepEqual(seen.gallery.map((g) => g.filename), ['a', 'c', 'd'])
+  assert.equal(contentForList(content, null), content)
 })

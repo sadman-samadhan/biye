@@ -4,8 +4,14 @@ import { useCallback } from 'react'
 import { prepareImage } from '@/lib/client/prepareImage'
 
 async function errorText(res, fallback) {
-  const data = await res.json().catch(() => ({}))
-  return data.error || fallback
+  const text = await res.text().catch(() => '')
+  let message = null
+  try {
+    message = JSON.parse(text).error
+  } catch {
+    // not JSON: a platform error page or timeout
+  }
+  return message || `${fallback} (error ${res.status}${res.status === 504 ? ', the server timed out' : ''})`
 }
 
 /**

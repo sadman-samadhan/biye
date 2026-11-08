@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import { getSiteContent } from '@/lib/server/site-data'
 import { getSiteForRequest } from '@/lib/server/site-view'
 import { pageOrigin } from '@/lib/server/site-access'
-import { ceremoniesForList, guestListFor } from '@/lib/invitation'
+import { contentForList, guestListFor } from '@/lib/invitation'
 import { resolveContentMedia } from '@/lib/server/media/resolve'
 import { getTheme, THEMES } from '@/themes/registry'
 import { getTradition } from '@/traditions'
@@ -54,7 +54,7 @@ export default async function SitePage({ slug, query = {}, view = 'auto', listId
   // A deleted list's link falls back to the couple's main link
   if (listId && !guestListFor(stored.invitation, listId)) redirect(`/${site.slug}`)
   const list = guestListFor(stored.invitation, listId || (viewer.canPreview ? null : guest?.list))
-  const content = await resolveContentMedia(site.id, stored, { publicOnly: publicOnlyMedia })
+  const content = await resolveContentMedia(site.id, contentForList(stored, list), { publicOnly: publicOnlyMedia })
   const tradition = getTradition(site.wedding_type || content.content?.wedding_type, site.tradition_variant)
 
   const banner = viewer.canPreview ? (
@@ -76,6 +76,5 @@ export default async function SitePage({ slug, query = {}, view = 'auto', listId
   if (shown === 'memories') return <SiteRenderer {...common} />
 
   const origin = await pageOrigin()
-  const invite = list ? { ...common, content: { ...content, ceremonies: ceremoniesForList(content.ceremonies, list) } } : common
-  return <InviteRenderer {...invite} mode={shown === 'live' ? 'live' : 'invite'} origin={origin} listId={list?.id || null} />
+  return <InviteRenderer {...common} mode={shown === 'live' ? 'live' : 'invite'} origin={origin} listId={list?.id || null} />
 }

@@ -18,13 +18,19 @@ function freshPasscode(taken) {
   }
 }
 
-/** Links for one saved list: plain (asks for the list's passcode) and one-tap (passcode built in). */
+/**
+ * Sharing for one saved list. The one-tap link carries the list's passcode, so
+ * guests never type anything; the passcode itself only shows under "More".
+ */
 function ListLinks({ list, access, slug }) {
   const toast = useToast()
   const [qr, setQr] = useState(null)
-  const url = `${access.siteUrl}/i/${list.id}`
+  const [more, setMore] = useState(false)
   const oneTap = access.listUnlockUrls?.[list.id] || null
-  const message = oneTap ? `You're invited to our wedding!\n${oneTap}` : `You're invited to our wedding!\n${url}\nPasscode: ${list.passcode}`
+  const plain = `${access.siteUrl}/i/${list.id}`
+  const link = oneTap || plain
+  const message = `You're invited to our wedding!
+${link}`
 
   async function copy(text, what) {
     try {
@@ -36,23 +42,18 @@ function ListLinks({ list, access, slug }) {
   }
 
   async function showQr() {
-    setQr(await QRCode.toDataURL(url, { margin: 1, width: 600, color: { dark: '#1E1A17', light: '#FFFFFF' } }))
+    setQr(await QRCode.toDataURL(link, { margin: 1, width: 600, color: { dark: '#1E1A17', light: '#FFFFFF' } }))
   }
 
   return (
     <div className="space-y-3 border-t border-sb-line pt-3">
       <div className="flex items-center gap-2">
-        <p className="min-w-0 flex-1 truncate rounded-lg bg-sb-paper px-3 py-2 font-mono text-xs text-sb-ink" title={url}>
-          {url}
+        <p className="min-w-0 flex-1 truncate rounded-lg bg-sb-paper px-3 py-2 font-mono text-xs text-sb-ink" title={link}>
+          {link}
         </p>
-        <Button size="sm" icon={Copy} onClick={() => copy(url, 'Link copied')}>
-          Link
+        <Button size="sm" icon={Copy} onClick={() => copy(link, 'Invitation link copied')}>
+          Copy link
         </Button>
-        {oneTap && (
-          <Button size="sm" icon={Copy} onClick={() => copy(oneTap, 'One-tap link copied')}>
-            One-tap
-          </Button>
-        )}
       </div>
       <div className="flex flex-wrap gap-2">
         <Button size="sm" icon={Share2} href={`https://wa.me/?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener">
@@ -61,17 +62,27 @@ function ListLinks({ list, access, slug }) {
         <Button size="sm" icon={QrCode} onClick={showQr}>
           QR code
         </Button>
+        <Button size="sm" variant="ghost" onClick={() => setMore((m) => !m)} aria-expanded={more}>
+          {more ? 'Less' : 'More'}
+        </Button>
       </div>
       {qr && (
         <div className="flex flex-wrap items-center gap-4 rounded-xl bg-sb-paper p-3">
           {/* eslint-disable-next-line @next/next/no-img-element -- generated QR data URL */}
           <img src={qr} alt={`QR code for ${list.name}`} className="h-28 w-28 rounded-lg bg-white p-1" />
           <div className="space-y-1 text-xs text-sb-muted">
-            <p>For printed cards for this group. Print the passcode {list.passcode} next to it.</p>
+            <p>For printed cards for this group. Scanning it opens their invitation directly.</p>
             <a href={qr} download={`${slug}-${list.name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-qr.png`} className="inline-flex items-center gap-1.5 text-sm font-medium text-sb-marigold-deep hover:underline">
               <Download size={14} /> Download PNG
             </a>
           </div>
+        </div>
+      )}
+      {more && (
+        <div className="space-y-1 rounded-xl bg-sb-paper p-3 text-xs text-sb-muted">
+          <p>
+            Guests who lose the link can open <span className="font-mono text-sb-ink">{plain}</span> and type <span className="font-mono text-sb-ink">{list.passcode}</span>.
+          </p>
         </div>
       )}
     </div>
@@ -115,8 +126,8 @@ export default function GuestListsSection({ lists, onChange, events, savedLists 
       <div>
         <p className="text-sm font-medium text-sb-ink">Guest lists</p>
         <p className="mt-1 text-xs text-sb-muted">
-          Not everyone is invited to every event. Make a list for each group of guests and send each group its own link or passcode: their invitation, countdown and RSVP show only their
-          events, even if they open your main link. Your main link and site passcode show every event, so keep those for the people invited to everything.
+          Not everyone is invited to every event. Make a list for each group of guests and send each group its own link: their invitation, countdown and RSVP show only their
+          events, even if they open your main link. Your main link shows every event, so keep it for the people invited to everything.
         </p>
       </div>
 
@@ -150,20 +161,29 @@ export default function GuestListsSection({ lists, onChange, events, savedLists 
             </div>
             {list.events.length === 0 && <p className="mt-2 text-xs text-sb-alta">Choose at least one event.</p>}
           </fieldset>
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-xs font-medium uppercase tracking-wider text-sb-muted">Passcode</span>
-            {list.passcode ? <span className="rounded-md bg-sb-paper px-2 py-1 font-mono text-sb-ink">{list.passcode}</span> : <span className="text-xs text-sb-alta">None yet</span>}
-            <Button size="sm" variant="ghost" icon={RefreshCw} onClick={() => set(i, { passcode: freshPasscode(taken(list.id)) })}>
-              {list.passcode ? 'New passcode' : 'Give this list a passcode'}
-            </Button>
-          </div>
-          {clashesWithSite(list) && <p className="text-xs text-sb-alta">This is the same as your site passcode, which opens every event. Choose a new one.</p>}
+          {clashesWithSite(list) && <p className="text-xs text-sb-alta">This list’s passcode is the same as your site passcode. Click “Turn off this link” to make a new one.</p>}
           {!list.passcode ? (
-            <p className="text-xs text-sb-muted">Give this list a passcode and save to get its link.</p>
+            <Button size="sm" icon={RefreshCw} onClick={() => set(i, { passcode: freshPasscode(taken(list.id)) })}>
+              Make this list’s link
+            </Button>
           ) : !saved(list) ? (
-            <p className="text-xs text-sb-muted">Save to get this list’s link. A new passcode turns the old one and its one-tap link off.</p>
+            <p className="text-xs text-sb-muted">Save to get this list’s link.</p>
           ) : access ? (
-            <ListLinks list={list} access={access} slug={slug} />
+            <>
+              <ListLinks list={list} access={access} slug={slug} />
+              <Button
+                size="sm"
+                variant="ghost"
+                icon={RefreshCw}
+                onClick={() => {
+                  if (window.confirm('Turn off this list’s current link? It stops working for anyone who hasn’t opened it yet. After saving, send the new link to the guests on this list.')) {
+                    set(i, { passcode: freshPasscode(taken(list.id)) })
+                  }
+                }}
+              >
+                Turn off this link
+              </Button>
+            </>
           ) : (
             <p className="text-xs text-sb-muted">Loading link…</p>
           )}

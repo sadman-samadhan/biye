@@ -10,21 +10,21 @@ import { MediaError, startUpload } from '@/lib/server/media/service'
  * through the app server (Vercel caps request bodies at 4.5 MB).
  */
 export async function POST(req, { params }) {
-  const { siteId } = await params
-  const { denied, user } = await authorizeSite(siteId)
-  if (denied) return denied
-  const crossOrigin = await assertSameOrigin()
-  if (crossOrigin) return crossOrigin
-
-  if (!(await rateLimitHit(`upload:${siteId}`, { limit: 400, windowS: 3600 }))) {
-    return NextResponse.json({ error: 'Too many uploads in the last hour. Try again later.' }, { status: 429 })
-  }
-
-  const body = await req.json().catch(() => null)
-  const site = await getSiteById(siteId)
-  if (!body || !site) return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
-
   try {
+    const { siteId } = await params
+    const { denied, user } = await authorizeSite(siteId)
+    if (denied) return denied
+    const crossOrigin = await assertSameOrigin()
+    if (crossOrigin) return crossOrigin
+
+    if (!(await rateLimitHit(`upload:${siteId}`, { limit: 400, windowS: 3600 }))) {
+      return NextResponse.json({ error: 'Too many uploads in the last hour. Try again later.' }, { status: 429 })
+    }
+
+    const body = await req.json().catch(() => null)
+    const site = await getSiteById(siteId)
+    if (!body || !site) return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
+
     const result = await startUpload({
       site,
       userId: user.id,
@@ -37,7 +37,8 @@ export async function POST(req, { params }) {
     })
     return NextResponse.json(result)
   } catch (err) {
-    const status = err instanceof MediaError ? err.status : 500
-    return NextResponse.json({ error: err.message }, { status })
+    if (err instanceof MediaError) return NextResponse.json({ error: err.message || 'Upload refused' }, { status: err.status })
+    console.error('[uploads] start failed:', err)
+    return NextResponse.json({ error: `Upload could not start: ${err?.message || 'server error'}` }, { status: 500 })
   }
 }
