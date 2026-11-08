@@ -3,9 +3,9 @@
  * shows "Ask us" so nothing is advertised before it is decided.
  */
 
-export const WHATSAPP_NUMBER = '8801954638110'
+export const WHATSAPP_NUMBER = '8801353630697'
 
-export const PRICES = { invite: null, memories: null, complete: '৳3,499' }
+export const PRICES = { invite: '৳999', memories: '৳1,499', complete: '৳1,999' }
 
 export const MARKETING = {
   en: {
