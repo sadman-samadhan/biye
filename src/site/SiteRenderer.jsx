@@ -68,7 +68,7 @@ export default function SiteRenderer({ site, content, theme, tradition, paletteI
 
   const navItems = [
     ...(on('story') && milestones.length ? [{ id: 'story', label: copy['nav.story'] }] : []),
-    ...(on('ceremonies') ? ceremonies.map((cer) => ({ id: cer.id, label: cer.title || { en: cer.id } })) : []),
+    ...(on('ceremonies') ? ceremonies.map((cer) => ({ id: cer.id, label: cer.title || { en: cer.id }, event: true })) : []),
     ...(on('gallery') && gallery.length ? [{ id: 'gallery', label: copy['nav.gallery'] }] : []),
     ...(on('blessings') && (duas.length || content.duas?.parentBlessings?.message) ? [{ id: 'blessings', label: copy['nav.blessings'] }] : []),
     ...(on('messages') ? [{ id: 'guestbook', label: copy['nav.guestbook'] }] : []),
@@ -112,7 +112,7 @@ export default function SiteRenderer({ site, content, theme, tradition, paletteI
     <ThemeRoot theme={theme} sitePalette={site.palette} paletteId={paletteId}>
       <OpeningGate kind={theme.opening} slug={site.slug} names={names} invocation={invocation} skipLabel={copy['opening.skip'].en} />
       {banner}
-      <Nav initials={initialsOf(names.en)} items={navItems} overDarkHero={v.hero === 'cinematic'} />
+      <Nav initials={initialsOf(names.en)} items={navItems} eventsLabel={copy['nav.events']} overDarkHero={v.hero === 'cinematic'} />
       <ScrollTools />
       {Frame && <Frame names={names} />}
       <div className={inset}>

@@ -7,6 +7,7 @@ export const BASE_COPY = {
   'hero.scroll': { en: 'Scroll to explore', bn: 'নিচে দেখুন' },
   'nav.home': { en: 'Home', bn: 'শুরু' },
   'nav.story': { en: 'Our Story', bn: 'আমাদের গল্প' },
+  'nav.events': { en: 'Events', bn: 'অনুষ্ঠান' },
   'nav.gallery': { en: 'Gallery', bn: 'ছবি' },
   'nav.blessings': { en: 'Blessings', bn: 'আশীর্বাদ' },
   'nav.guestbook': { en: 'Guestbook', bn: 'শুভেচ্ছা' },
